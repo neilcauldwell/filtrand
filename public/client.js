@@ -157,11 +157,11 @@ $(document).ready(function() {
     }
 
     if(channelName !== undefined) {
-      pusher.unsubscribe("presence-"+channelName);
+      pusher.unsubscribe(channelName);
     }
 
     channelName = encodeToChannelName(subject);
-    channel = pusher.subscribe("presence-"+channelName);
+    channel = pusher.subscribe(channelName);
     $("input[name=subject]").val(subject);
 
     window.Tweets.reset();
