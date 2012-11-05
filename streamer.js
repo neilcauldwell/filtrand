@@ -97,7 +97,7 @@ var includes = function(item, array) {
 var tweetEmitter = function(tweet) {
   var subjects = streamer.currentSubjects();
   for(var i in subjects) {
-    if(tweet.text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
+    if (tweet.text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
       emitTweet(subjects[i], tweet);
     }
   }
@@ -121,9 +121,8 @@ var emitTweet = function(subject, tweet) {
 };
 
 var emitEvent = function(channel, event, data) {
-  //pusher.trigger("presence-"+channel, event, data, null, function(err, req, res) {
   pusher.trigger(channel, event, data, null, function(err, req, res) {
-    if(err) {
+    if (err) {
       console.log("Could not emit event on Pusher API.", err);
     }
     else {
