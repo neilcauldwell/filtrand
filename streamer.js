@@ -11,6 +11,8 @@ var subjectToChannel = {};
 // staging
 //Pusher.prototype.domain = 'api.staging.pusherapp.com';
 
+
+
 // API
 
 var streamer = exports;
@@ -95,7 +97,7 @@ var includes = function(item, array) {
 var tweetEmitter = function(tweet) {
   var subjects = streamer.currentSubjects();
   for(var i in subjects) {
-    if (tweet.text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
+    if(tweet.text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
       emitTweet(subjects[i], tweet);
     }
   }
@@ -114,16 +116,17 @@ var emitTweet = function(subject, tweet) {
 			profile_image_url: tweet.user.profile_image_url,
 			text: tweet.text,
 			source: tweet.source
-		}
+		  }
   );
 };
 
 var emitEvent = function(channel, event, data) {
   //pusher.trigger("presence-"+channel, event, data, null, function(err, req, res) {
   pusher.trigger(channel, event, data, null, function(err, req, res) {
-    if (err) {
+    if(err) {
       console.log("Could not emit event on Pusher API.", err);
-    } else {
+    }
+    else {
       //console.log("Emitted tweet about " + subject + ": " + tweet.text)
     }
   });
