@@ -108,7 +108,7 @@ var emitTweet = function(subject, tweet) {
     "tweet",
     { type: 'tweet',
 			id: tweet.id,
-			tweetid: tweet.id_str,
+			tweetid: tweet.id,
 			created_at: tweet.created_at,
 			screen_name: tweet.user.screen_name,
 			profile_image_url: tweet.user.profile_image_url,
