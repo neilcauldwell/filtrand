@@ -11,8 +11,6 @@ var subjectToChannel = {};
 // staging
 //Pusher.prototype.domain = 'api.staging.pusherapp.com';
 
-
-
 // API
 
 var streamer = exports;
