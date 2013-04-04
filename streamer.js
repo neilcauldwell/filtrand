@@ -103,7 +103,7 @@ var tweetEmitter = function(tweet) {
 };
 
 var emitTweet = function(subject, tweet) {
-  var channel = streamer.subjectToChannel(subject).toLowerCase();
+  var channel = streamer.subjectToChannel(subject);
   emitEvent(
     channel,
     "tweet",

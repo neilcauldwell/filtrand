@@ -157,11 +157,11 @@ $(document).ready(function() {
     }
 
     if(channelName !== undefined) {
-      pusher.unsubscribe(channelName);
+      pusher.unsubscribe(channelName.toLowerCase());
     }
 
     channelName = encodeToChannelName(subject);
-    channel = pusher.subscribe(channelName);
+    channel = pusher.subscribe(channelName.toLowerCase());
     $("input[name=subject]").val(subject);
 
     window.Tweets.reset();
