@@ -18,7 +18,7 @@ var pusher = null;
 
 // start tracking passed subject
 streamer.track = function(channel) {
-  var subject = streamer.channelToSubject(channel);
+  var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
 
   if(!includes(subject, subjects)) {
@@ -31,7 +31,7 @@ streamer.track = function(channel) {
 
 // stop tracking passed subject
 streamer.untrack = function(channel) {
-  var subject = streamer.channelToSubject(channel);
+  var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
 
   if(includes(subject, subjects)) {
@@ -94,8 +94,9 @@ var includes = function(item, array) {
 
 var tweetEmitter = function(tweet) {
   var subjects = streamer.currentSubjects();
+  var text = tweet.text.toLowerCase();
   for(var i in subjects) {
-    if (tweet.text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
+    if (text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
       emitTweet(subjects[i], tweet);
     }
   }
