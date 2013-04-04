@@ -97,6 +97,7 @@ var tweetEmitter = function(tweet) {
   var text = tweet.text.toLowerCase();
   for(var i in subjects) {
     if (text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
+      console.log("matching hashtag found")
       emitTweet(subjects[i], tweet);
     }
   }
