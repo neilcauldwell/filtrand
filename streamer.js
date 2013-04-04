@@ -94,7 +94,9 @@ var includes = function(item, array) {
 
 var tweetEmitter = function(tweet) {
   var subjects = streamer.currentSubjects();
+  console.log("tweet text: " + tweet.text)
   var text = tweet.text.toLowerCase();
+  console.log("lowercase text: " + text)
   for(var i in subjects) {
     if (text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
       console.log("matching hashtag found")
