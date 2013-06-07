@@ -147,7 +147,7 @@ var setup = function(subjects) {
       sys.puts("wave goodbye... " + resp.statusCode);
     })
     .addListener('close', function(resp) {
-      sys.puts('The Twitter streaming server connection has been closed.');
+      sys.puts('A Twitter streaming connection has closed.');
     })
     .stream();
 
