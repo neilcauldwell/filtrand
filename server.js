@@ -63,6 +63,27 @@ app.post("/webhooks", function (req, res) {
   res.send({});
 });
 
+// Receive a ManualHook indicating subject channel occupied or vacated.
+app.post("/manualhooks", function (req, res) {
+  console.log("ManualHook received", req.body);
+
+  var events = req.body.events;
+  for (var i=0; i < events.length; i++) {
+    var event = events[i].name;
+    var channel = events[i].channel;
+
+    if (channel != "subjects") {
+      if (event == "channel_occupied") {
+        streamer.track(channel);
+      } else if (event == "channel_vacated") {
+        streamer.untrack(channel);
+      }
+    }
+  };
+
+  res.send({});
+});
+
 // run server
 
 var port = process.env.PORT || 5000;
