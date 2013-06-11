@@ -75,8 +75,10 @@ app.post("/manualhooks", function (req, res) {
     if (channel != "subjects") {
       if (event == "channel_occupied") {
         streamer.track(channel);
+        console.log("ManualHook dispatched track request:"+channel);
       } else if (event == "channel_vacated") {
         streamer.untrack(channel);
+        console.log("ManualHook dispatched untrack request:"+channel);
       }
     }
   };
