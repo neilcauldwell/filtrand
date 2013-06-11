@@ -65,7 +65,14 @@ app.post("/webhooks", function (req, res) {
 
 // Receive a ManualHook indicating subject channel occupied or vacated.
 app.post("/manualhooks", function (req, res) {
-  console.log("ManualHook received", req.body);
+  var given_key = req.headers['x-manualhook-key'];
+  var required_key = process.env.MANUALHOOK_KEY;
+
+  if (given_key != required_key) {
+    console.log("ManualHook denied", req.body);
+    res.send({}, 403);
+    return;
+  }
 
   var events = req.body.events;
   for (var i=0; i < events.length; i++) {
