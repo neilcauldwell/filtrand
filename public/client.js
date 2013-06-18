@@ -285,9 +285,13 @@ $(document).ready(function() {
   window.SubjectsPendingDisconnectionView = new SubjectsPendingDisconnectionView;
   window.TweetsView = new TweetsView;
 
-  // add existing subjs (sent from server) to collection
+  // add existing currentSubjects (sent from server) to collection
   for(var i = 0; i < currentSubjects.length; i++) {
     addSubject(currentSubjects[i]);
+  };
+
+  // add existing subjectsPendingDisconnection (sent from server) to collection
+  for(var i = 0; i < subjectsPendingDisconnection.length; i++) {
     addSubjectPendingDisconnection(subjectsPendingDisconnection[i]);
-  }
+  };
 });
