@@ -163,7 +163,7 @@ $(document).ready(function() {
     },
 
     addOne: function(subject) {
-      var view = new SubjectsPendingDisconnectionView({model: subject});
+      var view = new SubjectsPendingDisconnectionView({model: subjectPendingDisconnection});
       this.$("#subject-pending-disconnection-list").prepend(view.render().el);
       $(".already-tracking").show();
     },
