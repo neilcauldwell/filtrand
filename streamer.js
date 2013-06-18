@@ -15,28 +15,37 @@ var subjectToChannel = {};
 
 var streamer = exports;
 var pusher = null;
+var subjectsPendingDisconnection = [];
 
 // start tracking passed subject
 streamer.track = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
+  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
 
   if (!includes(subject, subjects)) {
     emitEvent("subjects", "subject-subscribed", { subject: subject });
     subjects.push(subject);
-  };
+    streamer.twit = setup(subjects);
 
-  streamer.twit = setup(subjects);
+    if (includes(subject, subjectsPendingDisconnection)) {
+      subjectsPendingDisconnection.splice(subjectsPendingDisconnection.indexOf(subject), 1);
+    };
+  };
 };
 
 // stop tracking passed subject
 streamer.untrack = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
+  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
 
   if (includes(subject, subjects)) {
     emitEvent("subjects", "subject-unsubscribed", { subject: subject });
-    subjects.splice(subjects.indexOf(subject), 1);
+
+    if (!includes(subject, subjectsPendingDisconnection)) {
+      subjectsPendingDisconnection.push(subject);
+    };
   };
 };
 
@@ -60,15 +69,32 @@ streamer.initiateReconnectionTimer = function() {
   }, 3600000);
 };
 
-streamer.reconnect = function(channel) {
+streamer.reconnectableSubjects = function() {
   var subjects = streamer.currentSubjects();
-  streamer.twit = setup(subjects);
+  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
+
+  for (var i = 0; i < subjectsPendingDisconnection.length; i++) {
+    subjects.splice(subjects.indexOf(subjectsPendingDisconnection[i]), 1);
+  };
+
+  return subjects;
+};
+
+streamer.reconnect = function() {
+  var subjects = streamer.reconnectableSubjects();
+  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
+
+  if (subjectsPendingDisconnection.length > 0) {
+    streamer.twit = setup(subjects);
+    streamer.subjectsPendingDisconnection = [];
+  };
 };
 
 streamer.currentSubjects = function() {
   var subjects = [];
-  if(streamer.twit !== undefined)
+  if (streamer.twit !== undefined) {
     subjects = streamer.twit.trackKeywords;
+  };
 
   return subjects;
 };
