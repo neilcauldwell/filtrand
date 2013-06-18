@@ -242,7 +242,7 @@ $(document).ready(function() {
 
   var subjectChannel = pusher.subscribe("subjects");
   window.Subjects = new SubjectList;
-  window.SubjectsPendingDisconnection = new SubjectsPendingDisconnectionList;
+  window.SubjectsPendingDisconnection = new SubjectPendingDisconnectionList;
 
   subjectChannel.bind("subject-subscribed", function(json) {
     var alreadyShown = false;
