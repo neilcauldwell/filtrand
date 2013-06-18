@@ -162,7 +162,7 @@ $(document).ready(function() {
       Pendings.bind('remove', this.removeOne, this);
     },
 
-    addOne: function(subject) {
+    addOne: function(pending) {
       var view = new PendingView({model: pending});
       this.$("#pending-list").prepend(view.render().el);
       $(".already-tracking").show();
