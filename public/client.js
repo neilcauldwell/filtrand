@@ -155,7 +155,7 @@ $(document).ready(function() {
 
   // main view for list of subjects pending disconnection
   window.PendingsView = Backbone.View.extend({
-    el: $("#subjects-pending-disconnection-view"),
+    el: $("#pendings-view"),
 
     initialize: function() {
       Pendings.bind('add', this.addOne, this);
