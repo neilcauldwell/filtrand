@@ -31,7 +31,7 @@ app.get("/", function (req, res) {
     key: process.env.PUSHER_KEY,
     layout: false,
     appTitle: appTitle,
-    currentSubjects: streamer.currentSubjects()
+    currentSubjects: streamer.currentSubjects(),
     subjectsPendingDisconnection: streamer.subjectsPendingDisconnection()
   };
 
