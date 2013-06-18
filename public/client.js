@@ -37,21 +37,21 @@ $(document).ready(function() {
     },
   });
 
-  // --------------- subject-pending-disconnection model
+  // --------------- pending model
 
-  window.SubjectPendingDisconnection = Backbone.Model.extend({
+  window.Pending = Backbone.Model.extend({
     url: "/"
   });
 
-  window.SubjectPendingDisconnectionList = Backbone.Collection.extend({
-    model: SubjectPendingDisconnection,
+  window.PendingList = Backbone.Collection.extend({
+    model: Pending,
     url: "/"
   });
 
-  window.SubjectPendingDisconnectionView = Backbone.View.extend({
+  window.PendingView = Backbone.View.extend({
     tagName:  "li",
-    className: "subject-pending-disconnection",
-    template: _.template($('#subject-pending-disconnection-item-template').html()),
+    className: "pending",
+    template: _.template($('#pending-item-template').html()),
 
     // listens for changes to its model, re-rendering.
     initialize: function() {
@@ -154,22 +154,22 @@ $(document).ready(function() {
   });
 
   // main view for list of subjects pending disconnection
-  window.SubjectsPendingDisconnectionView = Backbone.View.extend({
+  window.PendingsView = Backbone.View.extend({
     el: $("#subjects-pending-disconnection-view"),
 
     initialize: function() {
-      SubjectsPendingDisconnection.bind('add', this.addOne, this);
-      SubjectsPendingDisconnection.bind('remove', this.removeOne, this);
+      Pendings.bind('add', this.addOne, this);
+      Pendings.bind('remove', this.removeOne, this);
     },
 
     addOne: function(subject) {
-      var view = new SubjectPendingDisconnectionView({model: subjectPendingDisconnection});
-      this.$("#subject-pending-disconnection-list").prepend(view.render().el);
+      var view = new PendingView({model: pending});
+      this.$("#pending-list").prepend(view.render().el);
       $(".already-tracking").show();
     },
 
     removeOne: function() {
-      if(window.SubjectsPendingDisconnection.length == 0) {
+      if(window.Pendings.length == 0) {
         $(".already-tracking").hide();
       }
     }
@@ -199,11 +199,11 @@ $(document).ready(function() {
     }
   };
 
-  var addSubjectPendingDisconnection = function(subjectString) {
+  var addPending = function(subjectString) {
     if(subjectString !== null && subjectString !== undefined && subjectString.length > 0) {
-      var sub = new SubjectPendingDisconnection();
+      var sub = new Pending();
       sub.subject = subjectString;
-      window.SubjectsPendingDisconnection.add(sub);
+      window.Pendings.add(sub);
       return sub;
     }
   };
@@ -242,7 +242,7 @@ $(document).ready(function() {
 
   var subjectChannel = pusher.subscribe("subjects");
   window.Subjects = new SubjectList;
-  window.SubjectsPendingDisconnection = new SubjectPendingDisconnectionList;
+  window.Pendings = new PendingList;
 
   subjectChannel.bind("subject-subscribed", function(json) {
     var alreadyShown = false;
@@ -282,7 +282,7 @@ $(document).ready(function() {
 
   // Finally, we kick things off by creating the lis views.
   window.SubjectsView = new SubjectsView;
-  window.SubjectsPendingDisconnectionView = new SubjectsPendingDisconnectionView;
+  window.PendingsView = new PendingsView;
   window.TweetsView = new TweetsView;
 
   // add existing currentSubjects (sent from server) to collection
@@ -290,8 +290,8 @@ $(document).ready(function() {
     addSubject(currentSubjects[i]);
   };
 
-  // add existing subjectsPendingDisconnection (sent from server) to collection
-  for(var i = 0; i < subjectsPendingDisconnection.length; i++) {
-    addSubjectPendingDisconnection(subjectsPendingDisconnection[i]);
+  // add existing pendings (sent from server) to collection
+  for(var i = 0; i < pendings.length; i++) {
+    addPending(pendings[i]);
   };
 });

@@ -68,14 +68,14 @@ html(lang="en")
           <div class="subject-text"><a class="sidebar-subject" href="#"><%= this.model.subject %></div>
           </script>
 
-        #subjects-pending-disconnection-view
+        #pendings-view
           div(class="already-tracking", style='display:none;') Subjects Pending Disconnection
 
-          #subjects-pending-disconnection
-            ul#subject-pending-disconnection-list
+          #pendings
+            ul#pending-list
 
-          <script type="text/template" id="subject-pending-disconnection-item-template">
-          <div class="subject-pending-disconnection-text"><a class="sidebar-subject-pending-disconnection" href="#"><%= this.model.subject %></div>
+          <script type="text/template" id="pending-item-template">
+          <div class="pending-text"><a class="sidebar-pending" href="#"><%= this.model.subject %></div>
           </script>
 
     .footer
