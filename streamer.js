@@ -21,7 +21,6 @@ var subjectsPendingDisconnection = [];
 streamer.track = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
-  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
 
   if (!includes(subject, subjects)) {
     emitEvent("subjects", "subject-subscribed", { subject: subject });
@@ -38,7 +37,6 @@ streamer.track = function(channel) {
 streamer.untrack = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
-  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
 
   if (includes(subject, subjects)) {
     emitEvent("subjects", "subject-unsubscribed", { subject: subject });
@@ -71,7 +69,6 @@ streamer.initiateReconnectionTimer = function() {
 
 streamer.reconnectableSubjects = function() {
   var subjects = streamer.currentSubjects();
-  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
 
   for (var i = 0; i < subjectsPendingDisconnection.length; i++) {
     subjects.splice(subjects.indexOf(subjectsPendingDisconnection[i]), 1);
@@ -82,11 +79,10 @@ streamer.reconnectableSubjects = function() {
 
 streamer.reconnect = function() {
   var subjects = streamer.reconnectableSubjects();
-  var subjectsPendingDisconnection = streamer.subjectsPendingDisconnection();
 
   if (subjectsPendingDisconnection.length > 0) {
     streamer.twit = setup(subjects);
-    streamer.subjectsPendingDisconnection = [];
+    subjectsPendingDisconnection = [];
   };
 };
 
