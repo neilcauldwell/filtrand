@@ -29,7 +29,6 @@ streamer.track = function(channel) {
 
     if (includes(subject, subjectsPendingDisconnection)) {
       subjectsPendingDisconnection.splice(subjectsPendingDisconnection.indexOf(subject), 1);
-      console.log("subjectsPendingDisconnection:", subjectsPendingDisconnection);
     };
   };
 };
@@ -44,7 +43,6 @@ streamer.untrack = function(channel) {
 
     if (!includes(subject, subjectsPendingDisconnection)) {
       subjectsPendingDisconnection.push(subject);
-      console.log("subjectsPendingDisconnection:", subjectsPendingDisconnection);
     };
   };
 };
