@@ -95,6 +95,10 @@ streamer.currentSubjects = function() {
   return subjects;
 };
 
+streamer.subjectsPendingDisconnection = function() {
+  return subjectsPendingDisconnection();
+};
+
 // supporting functions
 
 streamer.subjectToChannel = function(subject) {

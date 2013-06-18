@@ -12,6 +12,7 @@ html(lang="en")
     | };
     | var pusher = new Pusher("#{key}");
     | var currentSubjects = "#{currentSubjects}".split(",");
+    | var subjectsPendingDisconnection = "#{subjectsPendingDisconnection}".split(",");
     </script>
 
     script(src="client.js")
@@ -67,6 +68,15 @@ html(lang="en")
           <div class="subject-text"><a class="sidebar-subject" href="#"><%= this.model.subject %></div>
           </script>
 
+        #subjects-pending-disconnection-view
+          div(class="already-tracking", style='display:none;') Subjects Pending Disconnection
+
+          #subjects-pending-disconnection
+            ul#subjects-pending-disconnection-list
+
+          <script type="text/template" id="subjects-pending-disconnection-item-template">
+          <div class="subjects-pending-disconnection-text"><a class="sidebar-subjects-pending-disconnection" href="#"><%= this.model.subject %></div>
+          </script>
 
     .footer
       <a href='http://pusher.com'>Pusher</a>&nbsp;&nbsp;&nbsp;

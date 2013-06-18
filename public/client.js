@@ -30,13 +30,41 @@ $(document).ready(function() {
       this.model.bind('destroy', this.remove, this);
     },
 
-    // re-render the contents of the tweet.
+    // re-render the contents of the subject.
     render: function() {
       $(this.el).html(this.template(this.model.toJSON()));
       return this;
     },
   });
 
+  // --------------- subject-pending-disconnection model
+
+  window.SubjectPendingDisconnection = Backbone.Model.extend({
+    url: "/"
+  });
+
+  window.SubjectPendingDisconnectionList = Backbone.Collection.extend({
+    model: SubjectPendingDisconnection,
+    url: "/"
+  });
+
+  window.SubjectPendingDisconnectionView = Backbone.View.extend({
+    tagName:  "li",
+    className: "subject-pending-disconnection",
+    template: _.template($('#subject-pending-disconnection-item-template').html()),
+
+    // listens for changes to its model, re-rendering.
+    initialize: function() {
+      this.model.bind('change', this.render, this);
+      this.model.bind('destroy', this.remove, this);
+    },
+
+    // re-render the contents of the subject.
+    render: function() {
+      $(this.el).html(this.template(this.model.toJSON()));
+      return this;
+    },
+  });
 
   //----------- tweet model
 
@@ -125,6 +153,27 @@ $(document).ready(function() {
     }
   });
 
+  // main view for list of subjects pending disconnection
+  window.SubjectsPendingDisconnectionView = Backbone.View.extend({
+    el: $("#subjects-pending-disconnection-view"),
+
+    initialize: function() {
+      SubjectsPendingDisconnection.bind('add', this.addOne, this);
+      SubjectsPendingDisconnection.bind('remove', this.removeOne, this);
+    },
+
+    addOne: function(subject) {
+      var view = new SubjectsPendingDisconnectionView({model: subject});
+      this.$("#subject-pending-disconnection-list").prepend(view.render().el);
+      $(".already-tracking").show();
+    },
+
+    removeOne: function() {
+      if(window.SubjectsPendingDisconnection.length == 0) {
+        $(".already-tracking").hide();
+      }
+    }
+  });
 
   //--------- helpers
 
@@ -146,6 +195,15 @@ $(document).ready(function() {
       var sub = new Subject();
       sub.subject = subjectString;
       window.Subjects.add(sub);
+      return sub;
+    }
+  };
+
+  var addSubjectPendingDisconnection = function(subjectString) {
+    if(subjectString !== null && subjectString !== undefined && subjectString.length > 0) {
+      var sub = new SubjectPendingDisconnection();
+      sub.subject = subjectString;
+      window.SubjectsPendingDisconnection.add(sub);
       return sub;
     }
   };
@@ -180,11 +238,11 @@ $(document).ready(function() {
     });
   }
 
-
   // ------------- main app setup
 
   var subjectChannel = pusher.subscribe("subjects");
   window.Subjects = new SubjectList;
+  window.SubjectsPendingDisconnection = new SubjectsPendingDisconnectionList;
 
   subjectChannel.bind("subject-subscribed", function(json) {
     var alreadyShown = false;
@@ -224,10 +282,12 @@ $(document).ready(function() {
 
   // Finally, we kick things off by creating the lis views.
   window.SubjectsView = new SubjectsView;
+  window.SubjectsPendingDisconnectionView = new SubjectsPendingDisconnectionView;
   window.TweetsView = new TweetsView;
 
   // add existing subjs (sent from server) to collection
   for(var i = 0; i < currentSubjects.length; i++) {
     addSubject(currentSubjects[i]);
+    addSubjectPendingDisconnection(subjectsPendingDisconnection[i]);
   }
 });

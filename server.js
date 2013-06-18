@@ -32,6 +32,7 @@ app.get("/", function (req, res) {
     layout: false,
     appTitle: appTitle,
     currentSubjects: streamer.currentSubjects()
+    subjectsPendingDisconnection: streamer.subjectsPendingDisconnection()
   };
 
   res.render('index.jade', returnVars);
