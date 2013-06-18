@@ -96,7 +96,7 @@ streamer.currentSubjects = function() {
 };
 
 streamer.subjectsPendingDisconnection = function() {
-  return subjectsPendingDisconnection();
+  return subjectsPendingDisconnection;
 };
 
 // supporting functions
