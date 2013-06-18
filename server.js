@@ -78,8 +78,6 @@ app.post("/manualhooks", function (req, res) {
   for (var i=0; i < events.length; i++) {
     var event = events[i].name;
     var channel = events[i].channel;
-    console.log("ManualHook received event:"+event);
-    console.log("ManualHook received event on channel:"+channel);
 
     if (channel != "subjects") {
       if (event == "channel_occupied") {
