@@ -12,6 +12,7 @@ var appTitle = "Filtrand";
 // setup twitter streamer
 streamer.appSetup(process.env.PUSHER_KEY, process.env.PUSHER_SECRET, process.env.PUSHER_APP_ID);
 streamer.twitterSetup(process.env.TWITTER_USERNAME, process.env.TWITTER_PASSWORD);
+streamer.initiateReconnectionTimer();
 
 // setup server
 var app = express.createServer();

@@ -21,10 +21,10 @@ streamer.track = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
 
-  if(!includes(subject, subjects)) {
+  if (!includes(subject, subjects)) {
     emitEvent("subjects", "subject-subscribed", { subject: subject });
     subjects.push(subject);
-  }
+  };
 
   streamer.twit = setup(subjects);
 };
@@ -34,12 +34,10 @@ streamer.untrack = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var subjects = streamer.currentSubjects();
 
-  if(includes(subject, subjects)) {
+  if (includes(subject, subjects)) {
     emitEvent("subjects", "subject-unsubscribed", { subject: subject });
     subjects.splice(subjects.indexOf(subject), 1);
-  }
-
-  streamer.twit = setup(subjects);
+  };
 };
 
 // setup the streamer with a Pusher connection
@@ -54,6 +52,17 @@ streamer.appSetup = function(key, secret, appId) {
 streamer.twitterSetup = function(username, password) {
   streamer.twitterUsername = username;
   streamer.twitterPassword = password;
+};
+
+streamer.initiateReconnectionTimer = function() {
+  setTimeout(function() {
+    streamer.reconnect();
+  }, 3600000);
+};
+
+streamer.reconnect = function(channel) {
+  var subjects = streamer.currentSubjects();
+  streamer.twit = setup(subjects);
 };
 
 streamer.currentSubjects = function() {
@@ -86,8 +95,8 @@ var includes = function(item, array) {
     if(item == array[i]) {
       included = true;
       break;
-    }
-  }
+    };
+  };
 
   return included;
 };
