@@ -47,7 +47,7 @@ ul#subject-list { padding: 0; margin:0; }
 li.subject { list-style:none; background-color:white; padding:10px 20px 10px 20px; }
 
 #subjects-pending-disconnection { margin-top:0;}
-ul#subjects-pending-disconnection-list { padding: 0; margin:0; }
-li.subjects-pending-disconnection { list-style:none; background-color:white; padding:10px 20px 10px 20px; }
+ul#subject-pending-disconnection-list { padding: 0; margin:0; }
+li.subject-pending-disconnection { list-style:none; background-color:white; padding:10px 20px 10px 20px; }
 
 .footer { padding:10px; margin-left:50px; text-align:center; width:360px; }
