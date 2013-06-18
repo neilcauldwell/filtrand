@@ -12,7 +12,7 @@ html(lang="en")
     | };
     | var pusher = new Pusher("#{key}");
     | var currentSubjects = "#{currentSubjects}".split(",");
-    | var subjectsPendingDisconnection = "#{subjectsPendingDisconnection}".split(",");
+    | var pendings = "#{pendings}".split(",");
     </script>
 
     script(src="client.js")
