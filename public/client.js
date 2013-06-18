@@ -44,7 +44,7 @@ $(document).ready(function() {
   });
 
   window.SubjectPendingDisconnectionList = Backbone.Collection.extend({
-    model: SubjectPendingDisconnection,
+    model: Pending,
     url: "/"
   });
 
@@ -163,7 +163,7 @@ $(document).ready(function() {
     },
 
     addOne: function(subject) {
-      var view = new SubjectsPendingDisconnectionView({model: subjectPendingDisconnection});
+      var view = new SubjectsPendingDisconnectionView({model: pending});
       this.$("#subject-pending-disconnection-list").prepend(view.render().el);
       $(".already-tracking").show();
     },
