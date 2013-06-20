@@ -143,6 +143,7 @@ var emitTweet = function(subject, tweet) {
     channel,
     "tweet",
     { type: 'tweet',
+      channel: channel,
 			id: tweet.id,
 			tweet_id: tweet.id_str,
       tweet_id_str: tweet.id_str,
