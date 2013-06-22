@@ -64,6 +64,7 @@ streamer.twitterSetup = function(username, password) {
 streamer.initiateReconnectionTimer = function() {
   setTimeout(function() {
     streamer.reconnect();
+    console.log("Sent streamer.reconnect()");
   }, 60000);
 };
 
