@@ -78,7 +78,7 @@ streamer.reconnectableSubjects = function() {
 
 streamer.reconnect = function() {
   var subjects = streamer.reconnectableSubjects();
-  if ((subjectsPendingDisconnection.length > 0) || streamer.reachedReconnectionInterval())) {
+  if ((subjectsPendingDisconnection.length > 0) || streamer.reachedReconnectionInterval()) {
     streamer.twit = setup(subjects);
     subjectsPendingDisconnection = [];
   };
