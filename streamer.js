@@ -134,12 +134,18 @@ var includes = function(item, array) {
 
 var tweetEmitter = function(tweet) {
   var subjects = streamer.currentSubjects();
-  var text = tweet.text.toLowerCase();
-  for(var i in subjects) {
-    if (text.indexOf(subjects[i]) != -1) { // emit if subject appears in tweet
-      emitTweet(subjects[i], tweet);
-    }
+
+  if (tweet.text !== undefined) {
+    var text = tweet.text.toLowerCase();
+    for (var i in subjects) {
+      if (text.indexOf(subjects[i]) != -1) {
+        emitTweet(subjects[i], tweet);
+      };
+    };
   }
+  else {
+    sys.puts("tweetEmitter received a tweet with undefined text: " + tweet);
+  };
 };
 
 var emitTweet = function(subject, tweet) {
