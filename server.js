@@ -52,8 +52,9 @@ app.post("/webhooks", function (req, res) {
   for (var i=0; i < events.length; i++) {
     var event = events[i].name;
     var channel = events[i].channel;
+    var presencePrefix = 'presence-';
 
-    if (channel.indexOf('presence-') == 0) {
+    if (channel.substring(0, presencePrefix.length) === presencePrefix) {
       if (channel != "subjects") {
         if (event == "channel_occupied") {
           streamer.track(channel);
@@ -82,8 +83,9 @@ app.post("/manualhooks", function (req, res) {
   for (var i=0; i < events.length; i++) {
     var event = events[i].name;
     var channel = events[i].channel;
+    var presencePrefix = 'presence-';
 
-    if (channel.indexOf('presence-') == 0) {
+    if (channel.substring(0, presencePrefix.length) === presencePrefix) {
       if (channel != "subjects") {
         if (event == "channel_occupied") {
           console.log("ManualHook dispatched track request:"+channel);
