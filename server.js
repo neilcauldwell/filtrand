@@ -53,13 +53,15 @@ app.post("/webhooks", function (req, res) {
     var event = events[i].name;
     var channel = events[i].channel;
 
-    if (channel != "subjects") {
-      if (event == "channel_occupied") {
-        streamer.track(channel);
-      } else if (event == "channel_vacated") {
-        streamer.untrack(channel);
-      }
-    }
+    if (channel.indexOf('presence-') == 0) {
+      if (channel != "subjects") {
+        if (event == "channel_occupied") {
+          streamer.track(channel);
+        } else if (event == "channel_vacated") {
+          streamer.untrack(channel);
+        };
+      };
+    };
   };
 
   res.send({});
@@ -81,15 +83,17 @@ app.post("/manualhooks", function (req, res) {
     var event = events[i].name;
     var channel = events[i].channel;
 
-    if (channel != "subjects") {
-      if (event == "channel_occupied") {
-        console.log("ManualHook dispatched track request:"+channel);
-        streamer.track(channel);
-      } else if (event == "channel_vacated") {
-        console.log("ManualHook dispatched untrack request:"+channel);
-        streamer.untrack(channel);
-      }
-    }
+    if (channel.indexOf('presence-') == 0) {
+      if (channel != "subjects") {
+        if (event == "channel_occupied") {
+          console.log("ManualHook dispatched track request:"+channel);
+          streamer.track(channel);
+        } else if (event == "channel_vacated") {
+          console.log("ManualHook dispatched untrack request:"+channel);
+          streamer.untrack(channel);
+        };
+      };
+    };
   };
 
   res.send({});
