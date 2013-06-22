@@ -144,7 +144,7 @@ var tweetEmitter = function(tweet) {
     };
   }
   else {
-    sys.puts("tweetEmitter received a tweet with undefined text: " + tweet.toSource);
+    console.log("tweetEmitter received a tweet with undefined text: " + tweet);
   };
 };
 
