@@ -16,6 +16,7 @@ var subjectToChannel = {};
 var streamer = exports;
 var pusher = null;
 var subjectsPendingDisconnection = [];
+var lastConnectionTimestamp = Date.now();
 
 // start tracking passed subject
 streamer.track = function(channel) {
@@ -63,28 +64,31 @@ streamer.twitterSetup = function(username, password) {
 
 streamer.initiateReconnectionTimer = function() {
   setInterval(function() {
-    console.log("Calling streamer.reconnect()");
     streamer.reconnect();
   }, 60000);
 };
 
 streamer.reconnectableSubjects = function() {
   var subjects = streamer.currentSubjects();
-
   for (var i = 0; i < subjectsPendingDisconnection.length; i++) {
     subjects.splice(subjects.indexOf(subjectsPendingDisconnection[i]), 1);
   };
-
   return subjects;
 };
 
 streamer.reconnect = function() {
   var subjects = streamer.reconnectableSubjects();
-
-  if (subjectsPendingDisconnection.length > 0) {
+  if ((subjectsPendingDisconnection.length > 0) || streamer.reachedReconnectionInterval())) {
     streamer.twit = setup(subjects);
     subjectsPendingDisconnection = [];
   };
+};
+
+streamer.reachedReconnectionInterval = function() {
+  var oneMinute = 60000;
+  var timeNow = Date.now();
+  var result = ((timeNow - lastConnectionTimestamp) > oneMinute);
+  return result
 };
 
 streamer.currentSubjects = function() {
@@ -175,18 +179,14 @@ var setup = function(subjects) {
     track: subjects
   });
 
-  twit.addListener('error', function(error) {
-    console.log(error.message);
-  });
-  twit
-    .addListener('tweet', tweetEmitter)
-    .addListener('end', function(resp) {
-      sys.puts("wave goodbye... " + resp.statusCode);
-    })
-    .addListener('close', function(resp) {
-      sys.puts('A Twitter streaming connection has closed.');
-    })
-    .stream();
+  twit.addListener('error', function(error) { console.log(error.message) });
+  twit.addListener('tweet', tweetEmitter);
+  twit.addListener('end', function(resp) { sys.puts("TwitterNode client received 'end' event: " + resp.statusCode) })
+  twit.addListener('close', function(resp) { sys.puts("TwitterNode client received 'close' event.") });
+
+  twit.stream();
+  console.log("Reconnected to Twitter Stream.");
+  lastConnectionTimestamp = Date.now();
 
   return twit;
 };
