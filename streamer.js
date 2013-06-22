@@ -146,7 +146,7 @@ var tweetEmitter = function(tweet) {
   else {
     console.log("tweetEmitter received a tweet with undefined text.");
     for (var name in tweet) {
-      console.log("tweetEmitter received tweet." + ".name: " + tweet[name]);
+      console.log("tweetEmitter received tweet." + name + ": " + tweet[name]);
     };
   };
 };
