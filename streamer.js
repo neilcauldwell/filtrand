@@ -78,16 +78,16 @@ streamer.reconnectableSubjects = function() {
 
 streamer.reconnect = function() {
   var subjects = streamer.reconnectableSubjects();
-  if ((subjectsPendingDisconnection.length > 0) || streamer.reachedReconnectionInterval()) {
+  if ((subjectsPendingDisconnection.length > 0)) {
     streamer.twit = setup(subjects);
     subjectsPendingDisconnection = [];
   };
 };
 
 streamer.reachedReconnectionInterval = function() {
-  var oneMinute = 60000;
+  var interval = 60000;
   var timeNow = Date.now();
-  var result = ((timeNow - lastConnectionTimestamp) > oneMinute);
+  var result = ((timeNow - lastConnectionTimestamp) > interval);
   return result
 };
 
