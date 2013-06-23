@@ -229,4 +229,4 @@ var ntwitterSetup = function(subjects) {
   console.log("ntwitterSetup complete.");
 };
 
-ntwitterSetup(['lol']);
+//ntwitterSetup(['lol']);
