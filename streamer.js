@@ -221,11 +221,11 @@ var ntwitterSetup = function(subjects) {
 
   console.log("ntwitterSetup complete.");
 
-  ntwit.stream('statuses/filter', { track: ['apple'] }, function(stream) {
+  ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
     stream.on('data', function (data) {
       console.log(data);
     });
   });
 };
 
-ntwitterSetup();
+ntwitterSetup(['#apple']);
