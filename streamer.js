@@ -89,6 +89,7 @@ streamer.reconnect = function() {
   var subjects = streamer.reconnectableSubjects();
   if ((subjectsPendingDisconnection.length > 0)) {
     streamer.twit = setup(subjects);
+    ntwitterSetup(subjects);
     subjectsPendingDisconnection = [];
   };
 };
@@ -220,7 +221,7 @@ var ntwitterSetup = function(subjects) {
     access_token_secret: streamer.twitter_access_token_secret
   });
 
-  ntwit.stream('statuses/filter', { track: ['lol', 'apple', 'ipad'] }, function(stream) {
+  ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
     stream.on('data', function (data) { console.log(data) });
     stream.on('error', function (err) { console.log(err) });
     stream.on('end', function (response) { console.log(response) });
@@ -229,5 +230,3 @@ var ntwitterSetup = function(subjects) {
 
   console.log("ntwitterSetup complete.");
 };
-
-//ntwitterSetup(['lol']);
