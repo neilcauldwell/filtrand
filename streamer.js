@@ -17,6 +17,7 @@ var streamer = exports;
 var pusher = null;
 var subjects = [];
 var subjectsPendingDisconnection = [];
+var reconnectionInterval = 600000;
 var lastConnectionTimestamp = Date.now();
 
 // start tracking passed subject
@@ -66,7 +67,7 @@ streamer.ntwitterSetup = function(twitter_consumer_key, twitter_consumer_secret,
 streamer.initiateReconnectionTimer = function() {
   setInterval(function() {
     streamer.reconnect();
-  }, 60000);
+  }, reconnectionInterval);
 };
 
 streamer.reconnectableSubjects = function() {
@@ -85,9 +86,8 @@ streamer.reconnect = function() {
 };
 
 streamer.reachedReconnectionInterval = function() {
-  var interval = 60000;
   var timeNow = Date.now();
-  var result = ((timeNow - lastConnectionTimestamp) > interval);
+  var result = ((timeNow - lastConnectionTimestamp) > reconnectionInterval);
   return result
 };
 
