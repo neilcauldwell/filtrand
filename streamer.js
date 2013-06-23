@@ -219,9 +219,13 @@ var ntwitterSetup = function(subjects) {
     access_token_secret: streamer.twitter_access_token_secret
   });
 
+  console.log("ntwitterSetup complete.");
+
   ntwit.stream('statuses/filter', { track: ['apple'] }, function(stream) {
     stream.on('data', function (data) {
       console.log(data);
     });
   });
 };
+
+ntwitterSetup();
