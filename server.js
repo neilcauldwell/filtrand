@@ -12,7 +12,7 @@ var appTitle = "Filtrand";
 // setup twitter streamer
 streamer.appSetup(process.env.PUSHER_KEY, process.env.PUSHER_SECRET, process.env.PUSHER_APP_ID);
 streamer.twitterSetup(process.env.TWITTER_USERNAME, process.env.TWITTER_PASSWORD);
-// streamer.ntwitterSetup(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, process.env.TWITTER_ACCESS_TOKEN_KEY, process.env.TWITTER_ACCESS_TOKEN_SECRET);
+streamer.ntwitterSetup(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, process.env.TWITTER_ACCESS_TOKEN_KEY, process.env.TWITTER_ACCESS_TOKEN_SECRET);
 streamer.initiateReconnectionTimer();
 
 // setup server
