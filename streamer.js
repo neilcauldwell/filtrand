@@ -219,22 +219,14 @@ var ntwitterSetup = function(subjects) {
     access_token_secret: streamer.twitter_access_token_secret
   });
 
-  console.log("ntwitterSetup complete.");
-
-  ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
-    stream.on('data', function (data) {
-      console.log(data);
-    });
-    stream.on('error', function (data) {
-      console.log(data);
-    });
-    stream.on('end', function (response) {
-      console.log(response); // Handle a disconnection
-    });
-    stream.on('destroy', function (response) {
-      console.log(response); // Handle a 'silent' disconnection from Twitter, no end/error event fired
-    });
+  ntwit.stream('statuses/filter', { track: ['lol', 'apple', 'ipad'] }, function(stream) {
+    stream.on('data', function (data) { console.log(data) });
+    stream.on('error', function (err) { console.log(err) });
+    stream.on('end', function (response) { console.log(response) });
+    stream.on('destroy', function (response) { console.log(response) });
   });
+
+  console.log("ntwitterSetup complete.");
 };
 
 ntwitterSetup(['lol']);
