@@ -223,7 +223,7 @@ var ntwitterSetup = function(subjects) {
 
   ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
     stream.on('data', function (data) {
-      console.log("Tweet received.");
+      console.log("Tweet received." + data.id);
       tweetEmitter(data);
     });
     stream.on('error', function (err) { console.log(err) });
