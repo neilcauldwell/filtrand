@@ -1,5 +1,6 @@
 var sys = require('sys');
 var TwitterNode = require('./vendor/twitter-node').TwitterNode;
+var ntwitter = require('ntwitter');
 var Pusher = require('node-pusher');
 
 var subjectToChannel = {};
@@ -60,6 +61,13 @@ streamer.appSetup = function(key, secret, appId) {
 streamer.twitterSetup = function(username, password) {
   streamer.twitterUsername = username;
   streamer.twitterPassword = password;
+};
+
+streamer.ntwitterSetup = function(twitter_consumer_key, twitter_consumer_secret, twitter_access_token_key, twitter_access_token_secret) {
+  streamer.twitter_consumer_key = twitter_consumer_key;
+  streamer.twitter_consumer_secret = twitter_consumer_secret;
+  streamer.twitter_access_token_key = twitter_access_token_key;
+  streamer.twitter_access_token_secret = twitter_access_token_secret;
 };
 
 streamer.initiateReconnectionTimer = function() {
@@ -201,4 +209,19 @@ var setup = function(subjects) {
   lastConnectionTimestamp = Date.now();
 
   return twit;
+};
+
+var ntwitterSetup = function(subjects) {
+  var ntwit = new ntwitter({
+    consumer_key: streamer.twitter_consumer_key,
+    consumer_secret: streamer.twitter_consumer_secret,
+    access_token_key: streamer.twitter_access_token_key,
+    access_token_secret: streamer.twitter_access_token_secret
+  });
+
+  ntwit.stream('statuses/filter', { track: ['apple'] }, function(stream) {
+    stream.on('data', function (data) {
+      console.log(data);
+    });
+  });
 };
