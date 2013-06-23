@@ -204,7 +204,7 @@ var setup = function(subjects) {
   twit.addListener('end', function(resp) { sys.puts("TwitterNode client received 'end' event: " + resp.statusCode) })
   twit.addListener('close', function(resp) { sys.puts("TwitterNode client received 'close' event.") });
 
-  // twit.stream();
+  twit.stream();
   console.log("Reconnected to Twitter Stream.");
   lastConnectionTimestamp = Date.now();
 
