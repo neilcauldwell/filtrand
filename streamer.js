@@ -219,12 +219,12 @@ var ntwitterSetup = function(subjects) {
     access_token_secret: streamer.twitter_access_token_secret
   });
 
-  ntwit.stream('statuses/filter', { track: ['lol', 'apple', 'ipad'] }, function(stream) {
-    stream.on('data', function (data) { console.log(data) });
-    stream.on('error', function (err) { console.log(err) });
-    stream.on('end', function (response) { console.log(response) });
-    stream.on('destroy', function (response) { console.log(response) });
-  });
+  //ntwit.stream('statuses/filter', { track: ['lol', 'apple', 'ipad'] }, function(stream) {
+  //  stream.on('data', function (data) { console.log(data) });
+  //  stream.on('error', function (err) { console.log(err) });
+  //  stream.on('end', function (response) { console.log(response) });
+  //  stream.on('destroy', function (response) { console.log(response) });
+  //});
 
   console.log("ntwitterSetup complete.");
 };
