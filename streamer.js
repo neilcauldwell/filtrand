@@ -204,7 +204,7 @@ var setup = function(subjects) {
   twit.addListener('end', function(resp) { sys.puts("TwitterNode client received 'end' event: " + resp.statusCode) })
   twit.addListener('close', function(resp) { sys.puts("TwitterNode client received 'close' event.") });
 
-  twit.stream();
+  // twit.stream();
   console.log("Reconnected to Twitter Stream.");
   lastConnectionTimestamp = Date.now();
 
@@ -224,6 +224,15 @@ var ntwitterSetup = function(subjects) {
   ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
     stream.on('data', function (data) {
       console.log(data);
+    });
+    stream.on('error', function (data) {
+      console.log(data);
+    });
+    stream.on('end', function (response) {
+      // Handle a disconnection
+    });
+    stream.on('destroy', function (response) {
+      // Handle a 'silent' disconnection from Twitter, no end/error event fired
     });
   });
 };
