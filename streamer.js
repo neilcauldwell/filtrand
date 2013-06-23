@@ -229,12 +229,12 @@ var ntwitterSetup = function(subjects) {
       console.log(data);
     });
     stream.on('end', function (response) {
-      // Handle a disconnection
+      console.log(response); // Handle a disconnection
     });
     stream.on('destroy', function (response) {
-      // Handle a 'silent' disconnection from Twitter, no end/error event fired
+      console.log(response); // Handle a 'silent' disconnection from Twitter, no end/error event fired
     });
   });
 };
 
-ntwitterSetup(['#apple']);
+ntwitterSetup(['lol']);
