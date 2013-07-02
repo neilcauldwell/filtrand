@@ -195,7 +195,7 @@ var ntwitterConnect = function() {
     stream.on('destroy', function (response) { console.log(response) });
   });
 
-  ntwit.search(subjects, {}, function(err, data) {
+  ntwit.search('#lol', {}, function(err, data) {
     console.log("Twitter search request returned: "+data);
 
     for (var i = 0; i < data.length; i++) {
