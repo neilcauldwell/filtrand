@@ -25,7 +25,7 @@ streamer.track = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
 
   if (!includes(subject, subjects)) {
-    emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", subject: subject });
+    emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", channel: subject, subject: subject });
     subjects.push(subject);
     ntwitterConnect();
 
@@ -40,7 +40,7 @@ streamer.untrack = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
 
   if (includes(subject, subjects)) {
-    emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed", subject: subject });
+    emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed", channel: subject, subject: subject });
 
     if (!includes(subject, subjectsPendingDisconnection)) {
       subjectsPendingDisconnection.push(subject);
