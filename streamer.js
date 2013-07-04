@@ -23,7 +23,7 @@ var lastConnectionTimestamp = Date.now();
 // start tracking passed subject
 streamer.track = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
-  var channelName = subjectToChannel(subject);
+  var channelName = streamer.subjectToChannel(subject);
 
   if (!includes(subject, subjects)) {
     emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", channel: channelName, subject: subject });
@@ -39,7 +39,7 @@ streamer.track = function(channel) {
 // stop tracking passed subject
 streamer.untrack = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
-  var channelName = subjectToChannel(subject);
+  var channelName = streamer.subjectToChannel(subject);
 
   if (includes(subject, subjects)) {
     emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed", channel: channelName, subject: subject });
