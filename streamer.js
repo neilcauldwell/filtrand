@@ -23,9 +23,10 @@ var lastConnectionTimestamp = Date.now();
 // start tracking passed subject
 streamer.track = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
+  var channelName = subjectToChannel(subject);
 
   if (!includes(subject, subjects)) {
-    emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", channel: subject, subject: subject });
+    emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", channel: channelName, subject: subject });
     subjects.push(subject);
     ntwitterConnect();
 
@@ -38,9 +39,10 @@ streamer.track = function(channel) {
 // stop tracking passed subject
 streamer.untrack = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
+  var channelName = subjectToChannel(subject);
 
   if (includes(subject, subjects)) {
-    emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed", channel: subject, subject: subject });
+    emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed", channel: channelName, subject: subject });
 
     if (!includes(subject, subjectsPendingDisconnection)) {
       subjectsPendingDisconnection.push(subject);
