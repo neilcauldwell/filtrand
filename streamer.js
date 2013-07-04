@@ -40,7 +40,7 @@ streamer.untrack = function(channel) {
   var subject = streamer.channelToSubject(channel).toLowerCase();
 
   if (includes(subject, subjects)) {
-    emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed" subject: subject });
+    emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed", subject: subject });
 
     if (!includes(subject, subjectsPendingDisconnection)) {
       subjectsPendingDisconnection.push(subject);
