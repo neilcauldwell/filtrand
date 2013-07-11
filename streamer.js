@@ -156,15 +156,25 @@ var emitTweet = function(subject, tweet) {
     "tweet",
     { type: 'tweet',
       channel: channel,
-			id: tweet.id,
+			id: tweet.id_str,
+      id_str: tweet.id_str,
 			tweet_id: tweet.id_str,
-      tweet_id_str: tweet.id_str,
 			created_at: tweet.created_at,
+      text: tweet.text,
+      source: tweet.source
+      twitter_id: tweet.user.id,
+      sender_id: tweet.user.id,
 			screen_name: tweet.user.screen_name,
 			profile_image_url: tweet.user.profile_image_url,
-			text: tweet.text,
-			source: tweet.source
-		  }
+      sender: {
+        id: tweet.user.id,
+        twitter_id: twitter_id,
+        display_name: tweet.user.screen_name,
+        screen_name: tweet.user.screen_name,
+        avatar_url: tweet.user.profile_image_url,
+        profile_image_url: tweet.user.profile_image_url,
+      },
+		}
   );
 };
 
