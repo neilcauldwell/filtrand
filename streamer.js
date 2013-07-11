@@ -161,7 +161,7 @@ var emitTweet = function(subject, tweet) {
 			tweet_id: tweet.id_str,
 			created_at: tweet.created_at,
       text: tweet.text,
-      source: tweet.source
+      source: tweet.source,
       twitter_id: tweet.user.id,
       sender_id: tweet.user.id,
 			screen_name: tweet.user.screen_name,
@@ -172,8 +172,8 @@ var emitTweet = function(subject, tweet) {
         display_name: tweet.user.screen_name,
         screen_name: tweet.user.screen_name,
         avatar_url: tweet.user.profile_image_url,
-        profile_image_url: tweet.user.profile_image_url,
-      },
+        profile_image_url: tweet.user.profile_image_url
+      }
 		}
   );
 };
