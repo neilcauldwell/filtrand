@@ -168,7 +168,7 @@ var emitTweet = function(subject, tweet) {
 			profile_image_url: tweet.user.profile_image_url,
       sender: {
         id: tweet.user.id,
-        twitter_id: twitter_id,
+        twitter_id: tweet.user.id,
         display_name: tweet.user.screen_name,
         screen_name: tweet.user.screen_name,
         avatar_url: tweet.user.profile_image_url,
