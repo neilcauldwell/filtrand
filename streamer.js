@@ -154,18 +154,45 @@ var emitTweet = function(subject, tweet) {
   emitEvent(
     channel,
     "tweet",
-    { type: 'tweet',
+    {
+      type: 'tweet',
       channel: channel,
-			id: tweet.id_str,
+
+      id: tweet.id_str,
       id_str: tweet.id_str,
-			tweet_id: tweet.id_str,
-			created_at: tweet.created_at,
+      tweet_id: tweet.id_str,
+      created_at: tweet.created_at,
       text: tweet.text,
+      truncated: tweet.truncated,
+      favorited: tweet.favorited,
+      in_reply_to_twitter_user_id_str: tweet.in_reply_to_user_id_str,
+      in_reply_to_status_id: tweet.in_reply_to_status_id,
+      in_reply_to_status_id_str: tweet.in_reply_to_status_id_str,
+      retweet_count: tweet.retweet_count,
+      retweeted: tweet.retweet,
+      possibly_sensitive: tweet.possibly_sensitive,
+      in_reply_to_twitter_user_id: tweet.in_reply_to_user_id,
       source: tweet.source,
+      in_reply_to_screen_name: tweet.in_reply_to_screen_name,
+      entities: tweet.entities,
+      contributors: tweet.contributors,
+      coordinates: tweet.coordinates,
+
+      geo: tweet.geo,
+      place: tweet.place,
+      retweeted_status: tweet.retweeted_status,
+      retweeted_status_id: tweet.retweeted_status.id,
+      retweeted_user_twitter_id: tweet.retweeted_status.user.id,
+      hashtags: tweet.entities.hashtags,
+      urls: tweet.entities.urls,
+      user_mentions: tweet.entities.user_mentions,
+      media: tweet.entities.media,
+
       twitter_id: tweet.user.id,
       sender_id: tweet.user.id,
-			screen_name: tweet.user.screen_name,
-			profile_image_url: tweet.user.profile_image_url,
+      screen_name: tweet.user.screen_name,
+      profile_image_url: tweet.user.profile_image_url,
+
       sender: {
         id: tweet.user.id,
         twitter_id: tweet.user.id,
@@ -174,7 +201,7 @@ var emitTweet = function(subject, tweet) {
         avatar_url: tweet.user.profile_image_url,
         profile_image_url: tweet.user.profile_image_url
       }
-		}
+    }
   );
 };
 
