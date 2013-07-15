@@ -181,8 +181,6 @@ var emitTweet = function(subject, tweet) {
       geo: tweet.geo,
       place: tweet.place,
       retweeted_status: tweet.retweeted_status,
-      retweeted_status_id: tweet.retweeted_status.id,
-      retweeted_user_twitter_id: tweet.retweeted_status.user.id,
       hashtags: tweet.entities.hashtags,
       urls: tweet.entities.urls,
       user_mentions: tweet.entities.user_mentions,
