@@ -1,6 +1,6 @@
 var sys = require('sys');
 var ntwitter = require('ntwitter');
-var Pusher = require('node-pusher');
+var Pusher = require('pusher');
 
 var subjectToChannel = {};
 
