@@ -31,6 +31,7 @@ streamer.track = function(channel) {
     emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", channel: channelName, subject: subject });
     subjects.push(subject);
     ntwitterConnect();
+    console.log("now tracking channel: " + subject)
 
     if (includes(subject, subjectsPendingDisconnection)) {
       subjectsPendingDisconnection.splice(subjectsPendingDisconnection.indexOf(subject), 1);
@@ -243,7 +244,7 @@ var ntwitterConnect = function() {
 
   ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
     stream.on('data', function (data) {
-      console.log("Tweet received." + data.id);
+      //console.log("Tweet received." + data.id);
       tweetEmitter(data);
     });
     stream.on('error', function (err) { console.log(err) });
