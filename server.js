@@ -1,4 +1,4 @@
-var sys = require('sys');
+var util = require('util');
 var url = require("url");
 var crypto = require("crypto");
 
