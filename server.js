@@ -73,6 +73,7 @@ app.post("/manualhooks", function (req, res) {
   var given_key = req.headers['x-manualhook-key'];
   var required_key = process.env.MANUALHOOK_KEY;
 
+
   if (given_key != required_key) {
     console.log("ManualHook denied", req.body);
     res.send({}, 403);
