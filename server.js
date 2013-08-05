@@ -13,6 +13,9 @@ var appTitle = "Filtrand";
 streamer.appSetup(process.env.PUSHER_KEY, process.env.PUSHER_SECRET, process.env.PUSHER_APP_ID);
 streamer.ntwitterSetup(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, process.env.TWITTER_ACCESS_TOKEN_KEY, process.env.TWITTER_ACCESS_TOKEN_SECRET);
 streamer.initiateReconnectionTimer();
+streamer.initFromExistingPusherChannels();
+
+// 
 
 // setup server
 var app = express.createServer();
@@ -52,21 +55,17 @@ app.post("/webhooks", function (req, res) {
   for (var i=0; i < events.length; i++) {
     var event = events[i].name;
     var channel = events[i].channel;
-    var presencePrefix = 'presence-';
 
-    if (channel.substring(0, presencePrefix.length) != presencePrefix) {
-      if (channel != "subjects") {
-        if (event == "channel_occupied") {
-          streamer.track(channel);
-        } else if (event == "channel_vacated") {
-          streamer.untrack(channel);
-        };
-      };
-    };
-  };
+    if (event == "channel_occupied") {
+      streamer.track(channel);
+    } else if (event == "channel_vacated") {
+      streamer.untrack(channel);
+    }
+  }
 
   res.send({});
 });
+
 
 // Receive a ManualHook indicating subject channel occupied or vacated.
 app.post("/manualhooks", function (req, res) {

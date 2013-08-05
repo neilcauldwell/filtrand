@@ -20,8 +20,10 @@ var subjectsPendingDisconnection = [];
 var reconnectionInterval = 600000;
 var lastConnectionTimestamp = Date.now();
 
+
 // start tracking passed subject
 streamer.track = function(channel) {
+  if (!streamer.isTrackableChannel(channel)) { return; }
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var channelName = streamer.subjectToChannel(subject);
 
@@ -36,8 +38,13 @@ streamer.track = function(channel) {
   };
 };
 
+streamer.isTrackableChannel = function(name) {
+  return name.indexOf('presence-') != 0 && name != 'subjects';
+}
+
 // stop tracking passed subject
 streamer.untrack = function(channel) {
+  if (!streamer.isTrackableChannel(channel)) { return; }
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var channelName = streamer.subjectToChannel(subject);
 
@@ -58,6 +65,18 @@ streamer.appSetup = function(key, secret, appId) {
     secret: secret
   });
 };
+
+streamer.initFromExistingPusherChannels = function() {
+  pusher.get({ path: '/channels', params: {}}, function( error, request, response ) {
+    if (error) { console.log("failed to load existing pusher channels with error: " + error); }
+    if( response.statusCode === 200 ) {
+      var result = JSON.parse( response.body );
+      var channelnames = Object.keys(result.channels);
+      console.log("found existing pusher channels: " + util.inspect(channelnames));
+      channelnames.forEach(function(name) { streamer.track(name); });
+    }
+  });    
+}
 
 streamer.ntwitterSetup = function(twitter_consumer_key, twitter_consumer_secret, twitter_access_token_key, twitter_access_token_secret) {
   streamer.twitter_consumer_key = twitter_consumer_key;
