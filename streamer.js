@@ -27,7 +27,7 @@ var lastConnectionTimestamp = Date.now();
 streamer.track = function(channel) {
   if (!streamer.isTrackableChannel(channel)) { 
     console.log("Attempted to track untrackable channel:" + channel);
-    sentry.captureError("Attempted to track untrackable channel:" + channel);
+    sentry.captureError("Attempted to track untrackable channel:" + channel, {level: "warning"});
     return; 
   }
   var subject = streamer.channelToSubject(channel).toLowerCase();
@@ -83,6 +83,7 @@ streamer.initFromExistingPusherChannels = function() {
       var result = JSON.parse( response.body );
       var channelnames = Object.keys(result.channels);
       console.log("found existing pusher channels: " + util.inspect(channelnames));
+      sentry.captureError("found existing pusher channels to reload:" + JSON.stringify(channelnames), {level: "info"});
       channelnames.forEach(function(name) { streamer.track(name); });
     }
   });    
@@ -259,7 +260,7 @@ var ntwitterConnect = function() {
     });
     stream.on('error', function (err) { 
       console.log("ntwitter: stream.error: " + err) 
-      sentry.captureError("ntwitter: stream.eror" + err,
+      sentry.captureError("ntwitter: stream.error: " + JSON.stringify(err),
         {extra: {subjects: JSON.stringify(subjects)}});
     });
     stream.on('end', function (response) { console.log("ntwitter: stream.end") });
