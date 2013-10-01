@@ -25,11 +25,7 @@ var lastConnectionTimestamp = Date.now();
 
 // start tracking passed subject
 streamer.track = function(channel) {
-  if (!streamer.isTrackableChannel(channel)) { 
-    console.log("Attempted to track untrackable channel:" + channel);
-    sentry.captureError("Attempted to track untrackable channel:" + channel, {level: "warning"});
-    return; 
-  }
+  if (!streamer.isTrackableChannel(channel)) { return; }
   var subject = streamer.channelToSubject(channel).toLowerCase();
   var channelName = streamer.subjectToChannel(subject);
 
