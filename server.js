@@ -3,6 +3,7 @@ var url = require("url");
 var crypto = require("crypto");
 
 var express = require("express");
+var raven = require('raven');
 
 var auth = require("./web_hooks_auth");
 var streamer = require("./streamer");
@@ -19,6 +20,8 @@ streamer.initFromExistingPusherChannels();
 
 // setup server
 var app = express.createServer();
+//use raven/sentry for error handing
+app.error(raven.middleware.express(process.env.SENTRY_DSN));
 // static content middleware
 app.use(express.static(__dirname + '/public'));
 // web hooks auth middleware, keep before body parser
