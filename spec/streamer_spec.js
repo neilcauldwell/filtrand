@@ -41,5 +41,27 @@ describe("for streamer", function() {
     });
   });
 
+  describe("with .thasWhiteListedSource", function() {
+    it("should be true for web", function() {
+      var tweet = { source: "nurph" };
+      expect(streamer.hasWhiteListedSource(tweet)).toBe(true);
+    });
+
+    it("should be true for web", function() {
+      var tweet = { source: "blah WEB blah" };
+      expect(streamer.hasWhiteListedSource(tweet)).toBe(true);
+    });
+    
+    it("should be true for hubspot", function() {
+      var tweet = { source: "blahhubspot" };
+      expect(streamer.hasWhiteListedSource(tweet)).toBe(true);
+    });
+
+    it("should not be true for tenchotweeter", function() {
+      var tweet = { source: "tenchotweeter" };
+      expect(streamer.hasWhiteListedSource(tweet)).toBe(false);
+    });
+  });
+
 
 });

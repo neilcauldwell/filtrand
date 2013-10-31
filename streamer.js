@@ -2,6 +2,7 @@ var util = require('util');
 var ntwitter = require('ntwitter');
 var Pusher = require('pusher');
 var raven = require('raven');
+var _ = require('underscore')._;
 var sentry = new raven.Client(process.env.SENTRY_DSN);
 
 var subjectToChannel = {};
@@ -21,6 +22,30 @@ var subjects = [];
 var subjectsPendingDisconnection = [];
 var reconnectionInterval = 600000;
 var lastConnectionTimestamp = Date.now();
+
+var tweetSourceWhiteList = [
+"hootsuite",
+"tweetdeck",
+"web",
+"nurph",
+"tweetchat powered by oneqube",
+"twitter for iphone",
+"twubs",
+"twitter web client",
+"twitter for android",
+"sprout social",
+"tweet button",
+"tweetbot for ios",
+"buffer",
+"sharedby",
+"twitter for ipad",
+"twitter for blackberry",
+"scoop.it",
+"hubspot",
+"oneqube",
+"tweetcaster for ios",
+"tchat.io"
+];
 
 
 // start tracking passed subject
@@ -155,7 +180,20 @@ var includes = function(item, array) {
   return included;
 };
 
+streamer.hasWhiteListedSource = function(tweet) {
+  var tweetsource = tweet.source.toLowerCase();
+  var matches = tweetSourceWhiteList.filter(function(source) {
+    return tweetsource.indexOf(source) != -1;
+  });
+  return matches.length > 0;
+};
+
 var tweetEmitter = function(tweet) {
+  //only emit tweets with a whitelisted source
+  if (!hasWhiteListedSource(tweet)) {
+    return;
+  }
+
   if (tweet.text !== undefined) {
     var text = tweet.text.toLowerCase();
     for (var i in subjects) {
