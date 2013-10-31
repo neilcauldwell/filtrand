@@ -1,6 +1,8 @@
 var util = require('util');
 var ntwitter = require('ntwitter');
 var Pusher = require('pusher');
+var raven = require('raven');
+var sentry = new raven.Client(process.env.SENTRY_DSN);
 
 var subjectToChannel = {};
 
@@ -69,11 +71,15 @@ streamer.appSetup = function(key, secret, appId) {
 
 streamer.initFromExistingPusherChannels = function() {
   pusher.get({ path: '/channels', params: {}}, function( error, request, response ) {
-    if (error) { console.log("failed to load existing pusher channels with error: " + error); }
+    if (error) { 
+      console.log("failed to load existing pusher channels with error: " + error); 
+      sentry.captureError("Failed load existing pusher channels with error: " + err);
+    }
     if( response.statusCode === 200 ) {
       var result = JSON.parse( response.body );
       var channelnames = Object.keys(result.channels);
       console.log("found existing pusher channels: " + util.inspect(channelnames));
+      sentry.captureError("found existing pusher channels to reload:" + JSON.stringify(channelnames), {level: "info"});
       channelnames.forEach(function(name) { streamer.track(name); });
     }
   });    
@@ -227,6 +233,8 @@ var emitEvent = function(channel, event, data) {
   pusher.trigger(channel, event, data, null, function(err, req, res) {
     if (err) {
       console.log("Could not emit event on Pusher API.", err);
+      sentry.captureError("Failed to emit Pusher event with error: " + err,
+        {extra: {channel: channel, data: JSON.stringify(data)}});
     }
     else {
       //console.log("Emitted tweet about " + subject + ": " + tweet.text)
@@ -244,12 +252,15 @@ var ntwitterConnect = function() {
 
   ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
     stream.on('data', function (data) {
-      //console.log("Tweet received." + data.id);
       tweetEmitter(data);
     });
-    stream.on('error', function (err) { console.log(err) });
-    stream.on('end', function (response) { console.log(response) });
-    stream.on('destroy', function (response) { console.log(response) });
+    stream.on('error', function (err) { 
+      console.log("ntwitter: stream.error: " + err) 
+      sentry.captureError("ntwitter: stream.error: " + JSON.stringify(err),
+        {extra: {subjects: JSON.stringify(subjects)}});
+    });
+    stream.on('end', function (response) { console.log("ntwitter: stream.end") });
+    stream.on('destroy', function (response) { console.log("ntwitter: stream.destroy") });
   });
 
   lastConnectionTimestamp = Date.now();
