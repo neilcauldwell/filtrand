@@ -189,7 +189,7 @@ streamer.hasWhiteListedSource = function(tweet) {
 
 var tweetEmitter = function(tweet) {
   //only emit tweets with a whitelisted source
-  if (!hasWhiteListedSource(tweet)) {
+  if (!streamer.hasWhiteListedSource(tweet)) {
     return;
   }
 
