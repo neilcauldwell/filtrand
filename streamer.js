@@ -2,7 +2,6 @@ var util = require('util');
 var ntwitter = require('ntwitter');
 var Pusher = require('pusher');
 var raven = require('raven');
-var _ = require('underscore')._;
 var sentry = new raven.Client(process.env.SENTRY_DSN);
 
 var subjectToChannel = {};
