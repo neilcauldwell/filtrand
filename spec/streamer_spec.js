@@ -61,6 +61,16 @@ describe("for streamer", function() {
       var tweet = { source: "tenchotweeter" };
       expect(streamer.hasWhiteListedSource(tweet)).toBe(false);
     });
+
+    it("should not be true for an undefined source", function() {
+      var tweet = {};
+      expect(streamer.hasWhiteListedSource(tweet)).toBe(false);
+    });
+
+    it("should not be true for a null tweet", function() {
+      var tweet = {};
+      expect(streamer.hasWhiteListedSource(tweet)).toBe(false);
+    });
   });
 
 

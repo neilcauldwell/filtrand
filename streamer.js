@@ -180,6 +180,7 @@ var includes = function(item, array) {
 };
 
 streamer.hasWhiteListedSource = function(tweet) {
+  if (!tweet || !tweet.source) { return false; }
   var tweetsource = tweet.source.toLowerCase();
   var matches = tweetSourceWhiteList.filter(function(source) {
     return tweetsource.indexOf(source) != -1;
