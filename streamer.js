@@ -23,9 +23,9 @@ var reconnectionInterval = 600000;
 var lastConnectionTimestamp = Date.now();
 
 var tweetSourceWhiteList = [
-"hootsuite",
-"tweetdeck",
 "web",
+"tweetdeck",
+"hootsuite",
 "nurph",
 "tweetchat powered by oneqube",
 "twitter for iphone",
@@ -43,9 +43,18 @@ var tweetSourceWhiteList = [
 "hubspot",
 "oneqube",
 "tweetcaster for ios",
-"tchat.io"
+"tchat.io",
+"seesmic", 
+"brizzly", 
+"twhirl", 
+"tweetie", 
+"twitterific", 
+"twitterfeed", 
+"metrotwit", 
+"janetter", 
+"instagram", 
+"echofon"
 ];
-
 
 // start tracking passed subject
 streamer.track = function(channel) {
@@ -182,10 +191,12 @@ var includes = function(item, array) {
 streamer.hasWhiteListedSource = function(tweet) {
   if (!tweet || !tweet.source) { return false; }
   var tweetsource = tweet.source.toLowerCase();
-  var matches = tweetSourceWhiteList.filter(function(source) {
-    return tweetsource.indexOf(source) != -1;
-  });
-  return matches.length > 0;
+  for (var i = 0; i < tweetSourceWhiteList.length; i++) {
+    if (tweetsource.indexOf(tweetSourceWhiteList[i]) != -1) {
+      return true;
+    }
+  }
+  return false;
 };
 
 var tweetEmitter = function(tweet) {
