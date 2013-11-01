@@ -27,6 +27,7 @@ var tweetSourceWhiteList = [
 "tweetdeck",
 "hootsuite",
 "nurph",
+"socialoomph",
 "tweetchat powered by oneqube",
 "twitter for iphone",
 "twubs",
@@ -53,7 +54,9 @@ var tweetSourceWhiteList = [
 "metrotwit", 
 "janetter", 
 "instagram", 
-"echofon"
+"echofon",
+"twitter for mac",
+"roundteam"
 ];
 
 // start tracking passed subject
