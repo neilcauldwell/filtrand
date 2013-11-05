@@ -2,6 +2,7 @@ var util = require('util');
 var ntwitter = require('ntwitter');
 var Pusher = require('pusher');
 var raven = require('raven');
+var da = require('./data_access');
 var sentry = new raven.Client(process.env.SENTRY_DSN);
 
 var subjectToChannel = {};
@@ -224,26 +225,26 @@ streamer.hasWhiteListedSource = function(tweet) {
 };
 
 var tweetEmitter = function(tweet) {
-  //only emit tweets with a whitelisted source
-  if (!streamer.hasWhiteListedSource(tweet)) {
+  if (tweet.text == undefined) {
+    da.store_received_tweet(tweet, null, false, "tweet object has undefined text field");
     return;
   }
 
-  if (tweet.text !== undefined) {
-    var text = tweet.text.toLowerCase();
+  //only emit tweets with a whitelisted source
+  if (!streamer.hasWhiteListedSource(tweet)) {
     for (var i in subjects) {
       if (text.indexOf(subjects[i]) != -1) {
-        emitTweet(subjects[i], tweet);
-      };
-    };
+        da.store_received_tweet(tweet, subject, false, "source not on whitelist");
+      }
+    }
+    return;
   }
-  else {
-    console.log("tweetEmitter received a tweet with undefined text.");
-    for (var propOne in tweet) {
-      console.log("tweetEmitter received tweet." + propOne + ": " + tweet[propOne]);
-      for (var propTwo in tweet[propOne]) {
-        console.log("tweetEmitter received tweet." + propOne + "." + propTwo + ": " + tweet[propOne][propTwo]);
-      };
+
+  var text = tweet.text.toLowerCase();
+  for (var i in subjects) {
+    if (text.indexOf(subjects[i]) != -1) {
+      emitTweet(subjects[i], tweet);
+      da.store_received_tweet(tweet, subjects[i], true);
     };
   };
 };
