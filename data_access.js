@@ -43,8 +43,6 @@ exports.store_received_tweet = function(tweet, subject, was_emitted, reject_reas
         sentry.captureError("PG Error: Failed to store received tweet with error:" + err);
         return console.error('PG Error: Failed to store received tweet with error', err); 
       }
-
-      return console.log('command completed successfuly');
     });
   });
 }
