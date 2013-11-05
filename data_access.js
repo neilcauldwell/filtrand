@@ -28,9 +28,9 @@ exports.store_received_tweet = function(tweet, subject, was_emitted, reject_reas
       filtered_tweets.insert({
         channel: subject, 
         was_emitted: was_emitted, 
-        rejected_reason: null,
-        filtered_at: reject_reason, 
-        created_at: new Date(),
+        rejected_reason: reject_reason,
+        filtered_at: new Date(), 
+        created_at: created_at,
         sender: sender,
         tweet_id: tweet_id, 
         source: source, 
