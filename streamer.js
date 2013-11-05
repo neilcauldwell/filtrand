@@ -230,6 +230,8 @@ var tweetEmitter = function(tweet) {
     return;
   }
 
+  var text = tweet.text.toLowerCase();
+
   //only emit tweets with a whitelisted source
   if (!streamer.hasWhiteListedSource(tweet)) {
     for (var i in subjects) {
@@ -240,7 +242,6 @@ var tweetEmitter = function(tweet) {
     return;
   }
 
-  var text = tweet.text.toLowerCase();
   for (var i in subjects) {
     if (text.indexOf(subjects[i]) != -1) {
       emitTweet(subjects[i], tweet);
