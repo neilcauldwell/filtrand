@@ -236,7 +236,7 @@ var tweetEmitter = function(tweet) {
   if (!streamer.hasWhiteListedSource(tweet)) {
     for (var i in subjects) {
       if (text.indexOf(subjects[i]) != -1) {
-        da.store_received_tweet(tweet, subject[i], false, "source not on whitelist");
+        da.store_received_tweet(tweet, subjects[i], false, "source not on whitelist");
       }
     }
     return;
