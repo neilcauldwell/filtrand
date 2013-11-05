@@ -11,7 +11,7 @@ var filtered_tweets = sql.define({
     'created_at', 'sender', 'tweet_id', 'source', 'json_value']
 });
 
-exports.store_received_tweet = function(subject, tweet, was_emitted, reject_reason) {
+exports.store_received_tweet = function(tweet, subject, was_emitted, reject_reason) {
 
   var sender = tweet.user ? tweet.user.screen_name : null;
   var created_at = tweet.created_at ? new Date(tweet.created_at) : null;
