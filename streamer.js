@@ -37,7 +37,7 @@ var tweetSourceWhiteList = [
   "twitter for android",
   "sprout social",
   "tweet button",
-  "tweetbot for ios",
+  "ios",
   "buffer",
   "sharedby",
   "twitter for ipad",
@@ -78,7 +78,10 @@ var tweetSourceWhiteList = [
   "ubersocial for blackberry",
   "twitter for windows phone",
   "blaq for blackberry® 10",
-  "chirpstory"
+  "chirpstory",
+  "tumblr",
+  "tweetro+",
+  "ubersocial"
 ];
 
 // start tracking passed subject
