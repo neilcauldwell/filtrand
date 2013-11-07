@@ -44,7 +44,7 @@ var tweetSourceWhiteList = [
   "twitter for blackberry",
   "scoop.it",
   "hubspot",
-  "tweetcaster for ios",
+  "tweetcaster",
   "tchat.io",
   "seesmic", 
   "brizzly", 
@@ -74,14 +74,13 @@ var tweetSourceWhiteList = [
   "sendible",
   "storify",
   "dlvr.it",
-  "tweetcaster for android",
-  "ubersocial for blackberry",
   "twitter for windows phone",
   "blaq for blackberry® 10",
   "chirpstory",
   "tumblr",
   "tweetro+",
-  "ubersocial"
+  "ubersocial",
+  "socialengage"
 ];
 
 // start tracking passed subject
