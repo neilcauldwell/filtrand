@@ -106,7 +106,9 @@ streamer.track = function(channel) {
 };
 
 streamer.isTrackableChannel = function(name) {
-  return name.indexOf('presence-') != 0 && name != 'subjects';
+  return name.indexOf('presence-') != 0 && 
+    name.indexOf('private-') != 0 &&
+    name != 'subjects';
 }
 
 // stop tracking passed subject

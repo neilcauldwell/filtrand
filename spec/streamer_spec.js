@@ -12,6 +12,12 @@ describe("for streamer", function() {
     it("'presence-mytweets' should NOT be trackable", function() {
       expect(streamer.isTrackableChannel('presence-mytweets')).toBe(false);
     });
+    it("'private-user1234' should NOT be trackable", function() {
+      expect(streamer.isTrackableChannel('private-user1234')).toBe(false);
+    });
+    it("'private-mystream' should NOT be trackable", function() {
+      expect(streamer.isTrackableChannel('private-mystream')).toBe(false);
+    });
   });
 
   describe("with .subjectToChannel", function() {
