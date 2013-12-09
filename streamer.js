@@ -49,6 +49,7 @@ var tweetSourceWhiteList = [
   "buffer",
   "twitterfeed", 
   "echofon",
+  "twittelator",
   "sprout social",
   "roundteam",
   "tweetcaster",
