@@ -14,13 +14,24 @@ var subjectToChannel = {};
 // staging
 //Pusher.prototype.domain = 'api.staging.pusherapp.com';
 
+//The way the streamer works is that every time we want to track a 
+//new channel it reconnects to twitter with the list of all the channels
+//to track.
+//At each reconnectionInterval it reconnects to everything again.
+//If we want to untrack a channel it gets added to the pending diconnection
+//list and when the reconnection interval comes up it doesn't try to reconnect
+//to it. We do it that way so we don't have excessive twitter connections
+//if a channel is tracked and untracked repeatedly within a few minutes.
+
+
 // API
 
 var streamer = exports;
 var pusher = null;
 var subjects = [];
 var subjectsPendingDisconnection = [];
-var reconnectionInterval = 600000;
+var reconnectionInterval = 600000; //10 minutes
+var channelCheckInterval = 20000; //20 seconds
 var lastConnectionTimestamp = Date.now();
 
 //all lowercase.
@@ -136,21 +147,36 @@ streamer.appSetup = function(key, secret, appId) {
   });
 };
 
-streamer.initFromExistingPusherChannels = function() {
+streamer.initPeriodicChannelCheck = function() {
+  setInterval(streamer.ensurePusherChannelsAreTracked, channelCheckInterval);
+};
+
+streamer.ensurePusherChannelsAreTracked = function() {
+  console.log('Ensuring pusher channels are tracked'); 
   pusher.get({ path: '/channels', params: {}}, function( error, request, response ) {
     if (error) { 
-      console.log("failed to load existing pusher channels with error: " + error); 
-      sentry.captureError("Failed load existing pusher channels with error: " + err);
-    }
-    if( response.statusCode === 200 ) {
+      var msg = "Failed to load existing pusher channels with error: " + error;
+      console.log(msg); 
+      sentry.captureError(msg);
+
+    } else if( response.statusCode === 200 ) {
       var result = JSON.parse( response.body );
-      var channelnames = Object.keys(result.channels);
-      console.log("found existing pusher channels: " + util.inspect(channelnames));
-      sentry.captureError("found existing pusher channels to reload:" + JSON.stringify(channelnames), {level: "info"});
-      channelnames.forEach(function(name) { streamer.track(name); });
+      var channelNames = Object.keys(result.channels);
+      console.log("found existing pusher channels: " + util.inspect(channelNames));
+
+      var missingChannels = channelNames.filter(streamer.isChannelMissing);
+      if (missingChannels.length) {
+        console.log("found missing channels we should be tracking: " + util.inspect(missingChannels));
+        missingChannels.forEach(function(name) { streamer.track(name); });
+      }
     }
-  });    
-}
+  });
+};
+
+streamer.isChannelMissing = function(name) {
+  var subject = streamer.channelToSubject(name).toLowerCase();
+  return streamer.isTrackableChannel(name) && !includes(subject, subjects);
+};
 
 streamer.ntwitterSetup = function(twitter_consumer_key, twitter_consumer_secret, twitter_access_token_key, twitter_access_token_secret) {
   streamer.twitter_consumer_key = twitter_consumer_key;

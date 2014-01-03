@@ -14,7 +14,7 @@ var appTitle = "Filtrand";
 streamer.appSetup(process.env.PUSHER_KEY, process.env.PUSHER_SECRET, process.env.PUSHER_APP_ID);
 streamer.ntwitterSetup(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, process.env.TWITTER_ACCESS_TOKEN_KEY, process.env.TWITTER_ACCESS_TOKEN_SECRET);
 streamer.initiateReconnectionTimer();
-streamer.initFromExistingPusherChannels();
+streamer.initPeriodicChannelCheck();
 
 // 
 

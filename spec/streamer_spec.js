@@ -79,5 +79,30 @@ describe("for streamer", function() {
     });
   });
 
+  describe("with .isChannelMissing", function() {
+    it("should be false when not trackable", function() {
+      expect(streamer.isChannelMissing('presence-foobar')).toBe(false);
+    });
+
+    it("should be true when trackable and no other channels", function() {
+      expect(streamer.isChannelMissing('foobar')).toBe(true);
+    });
+
+    it("should be true when trackable and different channels", function() {
+      streamer.currentSubjects().push('#channelname');
+      expect(streamer.isChannelMissing('foobar')).toBe(true);
+    });
+
+    it("should be false when already existing as a channel", function() {
+      streamer.currentSubjects().push('#foobar');
+      expect(streamer.isChannelMissing('foobar')).toBe(false);
+    });
+
+    it("should be false when already existing as a channel with different case", function() {
+      streamer.currentSubjects().push('#FooBar');
+      expect(streamer.isChannelMissing('foobar')).toBe(false);
+    });
+  });
+
 
 });
