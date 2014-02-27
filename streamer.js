@@ -265,10 +265,12 @@ var tweetEmitter = function(tweet) {
     return;
   }
 
+
   var text = tweet.text.toLowerCase();
 
   //only emit tweets with a whitelisted source
   if (!streamer.hasWhiteListedSource(tweet)) {
+    console.log("Received non-whitelisted tweet with text: " + tweet.text);
     for (var i in subjects) {
       if (text.indexOf(subjects[i]) != -1) {
         da.store_received_tweet(tweet, subjects[i], false, "source not on whitelist");
@@ -277,6 +279,7 @@ var tweetEmitter = function(tweet) {
     return;
   }
 
+  console.log("Received whitelisted tweet with text: " + tweet.text);
   for (var i in subjects) {
     if (text.indexOf(subjects[i]) != -1) {
       emitTweet(subjects[i], tweet);
