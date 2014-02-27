@@ -105,8 +105,7 @@ streamer.track = function(channels) {
   if (!Array.isArray(channels)) { channels = [channels]; }
   channels = channels.filter(streamer.isTrackableChannel);
   var subjectlist = channels.map( function (c) { return streamer.channelToSubject(c).toLowerCase(); });
-  var channelNames = subjectlist.map(streamer.subjectToChannel);
-  var newToTrack = channelNames.filter(function (s) { return !includes(s, subjects); });
+  var newToTrack = subjectlist.filter(function (s) { return !includes(s, subjects); });
 
   if (newToTrack.length) {
     newToTrack.forEach(function (subject) {
@@ -115,14 +114,14 @@ streamer.track = function(channels) {
       console.log("now tracking channel: " + subject)
     });
 
-    ntwitterConnect();
-
     newToTrack.forEach(function (subject) {
       if (includes(subject, subjectsPendingDisconnection)) {
         console.log("no longer pending disconnection for:" + subject)
         subjectsPendingDisconnection.splice(subjectsPendingDisconnection.indexOf(subject), 1);
       };
     });
+
+    ntwitterConnect();
   }
 };
 
@@ -367,6 +366,9 @@ var emitEvent = function(channel, event, data) {
 
 streamer.activeStream = null; //the twitter stream
 var ntwitterConnect = function() {
+  //TODO: we should process any pending disconnects and remove them from the disconnect
+  //list before we do the actual reconnection
+
   var previousStream = streamer.activeStream;
 
   ntwit = new ntwitter({
