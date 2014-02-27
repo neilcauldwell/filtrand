@@ -99,6 +99,7 @@ var tweetSourceWhiteList = [
   "tweetro+"
 ];
 
+
 // start tracking passed subject, can be a single channel, or an array of channels
 streamer.track = function(channels) {
   if (!Array.isArray(channels)) { channels = [channels]; }
@@ -364,8 +365,11 @@ var emitEvent = function(channel, event, data) {
   });
 };
 
+streamer.activeStream = null; //the twitter stream
 var ntwitterConnect = function() {
-  var ntwit = new ntwitter({
+  var previousStream = streamer.activeStream;
+
+  ntwit = new ntwitter({
     consumer_key: streamer.twitter_consumer_key,
     consumer_secret: streamer.twitter_consumer_secret,
     access_token_key: streamer.twitter_access_token_key,
@@ -374,17 +378,26 @@ var ntwitterConnect = function() {
 
   console.log("ntwitterConnect with subjects" + util.inspect(subjects));
   ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
+    streamer.activeStream = stream;
     stream.on('data', function (data) {
       tweetEmitter(data);
     });
-    stream.on('error', function (err) { 
-      console.log("ntwitter: stream.error: " + err) 
-      sentry.captureError("ntwitter: stream.error: " + JSON.stringify(err),
-        {extra: {subjects: JSON.stringify(subjects)}});
+    stream.on('error', function (err, statusCode) { 
+      statusCode = statusCode || 200;
+      console.log("ntwitter.stream Error: " + err + " StatusCode: " + statusCode); 
+      sentry.captureError("ntwitter.stream Error: " + JSON.stringify(err),
+        {extra: {subjects: JSON.stringify(subjects), statusCode: statusCode}});
     });
-    stream.on('end', function (response) { console.log("ntwitter: stream.end") });
-    stream.on('destroy', function (response) { console.log("ntwitter: stream.destroy") });
+    stream.on('end', function (response) { console.log("ntwitter.stream Ended") });
+    stream.on('destroy', function (response) { console.log("ntwitter.stream Destroyed") });
   });
 
   lastConnectionTimestamp = Date.now();
+
+  //if there was a previous stream wait 3 seconds for the 
+  //new stream to come online before killing the old one
+  if (previousStream) {
+    setTimeout(function() { previousStream.destroy(); }, 3000);
+  }
+
 };
