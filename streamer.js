@@ -31,7 +31,7 @@ var pusher = null;
 var subjects = [];
 var subjectsPendingDisconnection = [];
 var reconnectionInterval = 600000; //10 minutes
-var channelCheckInterval = 60000; //60 seconds
+var channelCheckInterval = 30000; //30 seconds
 var lastConnectionTimestamp = Date.now();
 
 //all lowercase.
@@ -103,24 +103,26 @@ var tweetSourceWhiteList = [
 streamer.track = function(channels) {
   if (!Array.isArray(channels)) { channels = [channels]; }
   channels = channels.filter(streamer.isTrackableChannel);
-  var subjects = channels.map( function (ch) { return streamer.channelToSubject(ch).toLowerCase());
-  var channelNames = subjects.map(streamer.subjectToChannel);
+  var subjectlist = channels.map( function (c) { return streamer.channelToSubject(c).toLowerCase(); });
+  var channelNames = subjectlist.map(streamer.subjectToChannel);
+  var newToTrack = channelNames.filter(function (s) { return !includes(s, subjects); });
 
-  var newToTrack = channelNames.filter(function (s) { return includes(s, subjects); });
-  newToTrack.forEach(function (subject) {
-    emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", channel: channelName, subject: subject });
-    subjects.push(subject);
-    console.log("now tracking channel: " + subject)
-  });
+  if (newToTrack.length) {
+    newToTrack.forEach(function (subject) {
+      emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", subject: subject });
+      subjects.push(subject);
+      console.log("now tracking channel: " + subject)
+    });
 
-  ntwitterConnect();
+    ntwitterConnect();
 
-  newToTrack.forEach(function (subject) {
-    if (includes(subject, subjectsPendingDisconnection)) {
-      console.log("no longer pending disconnection for:" + subject)
-      subjectsPendingDisconnection.splice(subjectsPendingDisconnection.indexOf(subject), 1);
-    };
-  });
+    newToTrack.forEach(function (subject) {
+      if (includes(subject, subjectsPendingDisconnection)) {
+        console.log("no longer pending disconnection for:" + subject)
+        subjectsPendingDisconnection.splice(subjectsPendingDisconnection.indexOf(subject), 1);
+      };
+    });
+  }
 };
 
 streamer.isTrackableChannel = function(name) {
@@ -154,6 +156,7 @@ streamer.appSetup = function(key, secret, appId) {
 };
 
 streamer.initPeriodicChannelCheck = function() {
+  streamer.ensurePusherChannelsAreTracked();
   setInterval(streamer.ensurePusherChannelsAreTracked, channelCheckInterval);
 };
 
@@ -169,7 +172,7 @@ streamer.ensurePusherChannelsAreTracked = function() {
       var result = JSON.parse( response.body );
       var channelNames = Object.keys(result.channels);
       var channelNames = channelNames.filter(streamer.isTrackableChannel);
-      console.log("found " + channelNames.length + " existing trackable pusher channels: " + );
+      console.log("found " + channelNames.length + " existing trackable pusher channels");
 
       var missingChannels = channelNames.filter(streamer.isChannelMissing);
       if (missingChannels.length) {
@@ -272,7 +275,6 @@ var tweetEmitter = function(tweet) {
     return;
   }
 
-
   var text = tweet.text.toLowerCase();
 
   //only emit tweets with a whitelisted source
@@ -370,6 +372,7 @@ var ntwitterConnect = function() {
     access_token_secret: streamer.twitter_access_token_secret
   });
 
+  console.log("ntwitterConnect with subjects" + util.inspect(subjects));
   ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
     stream.on('data', function (data) {
       tweetEmitter(data);
@@ -384,5 +387,4 @@ var ntwitterConnect = function() {
   });
 
   lastConnectionTimestamp = Date.now();
-  console.log("ntwitterConnect completed.");
 };
