@@ -31,7 +31,7 @@ var pusher = null;
 var subjects = [];
 var subjectsPendingDisconnection = [];
 var reconnectionInterval = 600000; //10 minutes
-var channelCheckInterval = 20000; //20 seconds
+var channelCheckInterval = 60000; //60 seconds
 var lastConnectionTimestamp = Date.now();
 
 //all lowercase.
@@ -99,22 +99,28 @@ var tweetSourceWhiteList = [
   "tweetro+"
 ];
 
-// start tracking passed subject
-streamer.track = function(channel) {
-  if (!streamer.isTrackableChannel(channel)) { return; }
-  var subject = streamer.channelToSubject(channel).toLowerCase();
-  var channelName = streamer.subjectToChannel(subject);
+// start tracking passed subject, can be a single channel, or an array of channels
+streamer.track = function(channels) {
+  if (!Array.isArray(channels)) { channels = [channels]; }
+  channels = channels.filter(streamer.isTrackableChannel);
+  var subjects = channels.map( function (ch) { return streamer.channelToSubject(ch).toLowerCase());
+  var channelNames = subjects.map(streamer.subjectToChannel);
 
-  if (!includes(subject, subjects)) {
+  var newToTrack = channelNames.filter(function (s) { return includes(s, subjects); });
+  newToTrack.forEach(function (subject) {
     emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", channel: channelName, subject: subject });
     subjects.push(subject);
-    ntwitterConnect();
     console.log("now tracking channel: " + subject)
+  });
 
+  ntwitterConnect();
+
+  newToTrack.forEach(function (subject) {
     if (includes(subject, subjectsPendingDisconnection)) {
+      console.log("no longer pending disconnection for:" + subject)
       subjectsPendingDisconnection.splice(subjectsPendingDisconnection.indexOf(subject), 1);
     };
-  };
+  });
 };
 
 streamer.isTrackableChannel = function(name) {
@@ -162,12 +168,13 @@ streamer.ensurePusherChannelsAreTracked = function() {
     } else if( response.statusCode === 200 ) {
       var result = JSON.parse( response.body );
       var channelNames = Object.keys(result.channels);
-      console.log("found existing pusher channels: " + util.inspect(channelNames));
+      var channelNames = channelNames.filter(streamer.isTrackableChannel);
+      console.log("found " + channelNames.length + " existing trackable pusher channels: " + );
 
       var missingChannels = channelNames.filter(streamer.isChannelMissing);
       if (missingChannels.length) {
         console.log("found missing channels we should be tracking: " + util.inspect(missingChannels));
-        missingChannels.forEach(function(name) { streamer.track(name); });
+        streamer.track(missingChannels);
       }
     }
   });
