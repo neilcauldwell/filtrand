@@ -211,6 +211,7 @@ streamer.reconnectableSubjects = function() {
 streamer.reconnect = function() {
   var subjects = streamer.reconnectableSubjects();
   if ((subjectsPendingDisconnection.length > 0)) {
+    console.log("Initiating reconnect and clearing out pending disconnects for: " + util.inspect(subjectsPendingDisconnection));
     ntwitterConnect();
     subjectsPendingDisconnection = [];
   };
