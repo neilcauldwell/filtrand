@@ -172,7 +172,7 @@ streamer.ensurePusherChannelsAreTracked = function() {
       var result = JSON.parse( response.body );
       var channelNames = Object.keys(result.channels);
       var channelNames = channelNames.filter(streamer.isTrackableChannel);
-      console.log("found " + channelNames.length + " existing trackable pusher channels");
+      console.log("found " + channelNames.length + " trackable pusher channels");
 
       var missingChannels = channelNames.filter(streamer.isChannelMissing);
       if (missingChannels.length) {
