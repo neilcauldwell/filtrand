@@ -186,8 +186,9 @@ $(document).ready(function() {
 
   // avoids the chars disallowed in channel names
   var encodeToChannelName = function(str) {
-    return encodeURIComponent(str).replace('-', '-0').replace('_', '-1').replace('.', '-2')
+    var encoded = encodeURIComponent(str).replace('-', '-0').replace('_', '-1').replace('.', '-2')
       .replace('!', '-3').replace('~', '-4').replace('*', '-5').replace('(', '-6').replace(')', '-7');
+    return "presence-" + encoded;
   };
 
   var addSubject = function(subjectString) {
