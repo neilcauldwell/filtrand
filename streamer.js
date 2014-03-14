@@ -353,7 +353,7 @@ var emitTweet = function(subject, tweet) {
 };
 
 var emitEvent = function(channel, event, data) {
-  pusher.trigger(channel, event, data, null, function(err, req, res) {
+  pusher.trigger('presence-' + channel, event, data, null, function(err, req, res) {
     if (err) {
       console.log("Could not emit event on Pusher API.", err);
       sentry.captureError("Failed to emit Pusher event with error: " + err,
