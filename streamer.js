@@ -104,7 +104,7 @@ var tweetSourceWhiteList = [
 streamer.track = function(channels) {
   if (!Array.isArray(channels)) { channels = [channels]; }
   channels = channels.filter(streamer.isTrackableChannel);
-  var subjectlist = channels.map( function (c) { return streamer.channelToSubject(c).toLowerCase(); });
+  var subjectlist = channels.map( function (c) { return streamer.channelToSubject(c); });
   var newToTrack = subjectlist.filter(function (s) { return !includes(s, subjects); });
 
   if (newToTrack.length) {
@@ -140,7 +140,7 @@ streamer.extractPresenceChannel = function(name) {
 // stop tracking passed subject
 streamer.untrack = function(channel) {
   if (!streamer.isTrackableChannel(channel)) { return; }
-  var subject = streamer.channelToSubject(channel).toLowerCase();
+  var subject = streamer.channelToSubject(channel);
   var channelName = streamer.subjectToChannel(subject);
 
   if (includes(subject, subjects)) {
@@ -190,7 +190,7 @@ streamer.ensurePusherChannelsAreTracked = function() {
 };
 
 streamer.isChannelMissing = function(name) {
-  var subject = streamer.channelToSubject(name).toLowerCase();
+  var subject = streamer.channelToSubject(name);
   return streamer.isTrackableChannel(name) && !includes(subject, subjects);
 };
 
