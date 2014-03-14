@@ -216,11 +216,11 @@ $(document).ready(function() {
     }
 
     if(channelName !== undefined) {
-      pusher.unsubscribe(channelName.toLowerCase());
+      pusher.unsubscribe(channelName);
     }
 
     channelName = encodeToChannelName(subject);
-    channel = pusher.subscribe(channelName.toLowerCase());
+    channel = pusher.subscribe(channelName, { user_id: "__NurphOraclePusherMonitor__" });
     $("input[name=subject]").val(subject);
 
     window.Tweets.reset();
