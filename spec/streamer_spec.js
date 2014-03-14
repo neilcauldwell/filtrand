@@ -6,11 +6,11 @@ describe("for streamer", function() {
     it("'subjects' should NOT be trackable", function() {
       expect(streamer.isTrackableChannel('subjects')).toBe(false);
     });
-    it("'mytweets' should be trackable", function() {
-      expect(streamer.isTrackableChannel('mytweets')).toBe(true);
+    it("'mytweets' should NOTbe trackable", function() {
+      expect(streamer.isTrackableChannel('mytweets')).toBe(false);
     });
-    it("'presence-mytweets' should NOT be trackable", function() {
-      expect(streamer.isTrackableChannel('presence-mytweets')).toBe(false);
+    it("'presence-mytweets' should be trackable", function() {
+      expect(streamer.isTrackableChannel('presence-mytweets')).toBe(true);
     });
     it("'private-user1234' should NOT be trackable", function() {
       expect(streamer.isTrackableChannel('private-user1234')).toBe(false);
@@ -20,30 +20,44 @@ describe("for streamer", function() {
     });
   });
 
+  describe("with .extractPresenceChannel" , function() {
+    it("should return mystream for presence-mystream", function() {
+      expect(streamer.extractPresenceChannel('presence-mystream')).toEqual('mystream');
+    });
+
+    it("should return null for private-mystream", function() {
+      expect(streamer.extractPresenceChannel('private-mystream')).toEqual(null);
+    });
+
+    it("should return null for mystream", function() {
+      expect(streamer.extractPresenceChannel('mystream')).toEqual(null);
+    });
+  });
+
   describe("with .subjectToChannel", function() {
-    it("'#tweets' should be 'tweets'", function() {
-      expect(streamer.subjectToChannel('#tweets')).toEqual('tweets');
+    it("'#tweets' should be 'presence-tweets'", function() {
+      expect(streamer.subjectToChannel('#tweets')).toEqual('presence-tweets');
     });
-    it("'tweets' should be 'tweets'", function() {
-      expect(streamer.subjectToChannel('tweets')).toEqual('tweets');
+    it("'tweets' should be 'presence-tweets'", function() {
+      expect(streamer.subjectToChannel('tweets')).toEqual('presence-tweets');
     });
-    it("'#OZstuff' should be 'OZstuff'", function() {
-      expect(streamer.subjectToChannel('#OZstuff')).toEqual('OZstuff');
+    it("'#OZstuff' should be 'presence-OZstuff'", function() {
+      expect(streamer.subjectToChannel('#OZstuff')).toEqual('presence-OZstuff');
     });
-    it("'#my_channel' should be 'my_channel'", function() {
-      expect(streamer.subjectToChannel('#my_channel')).toEqual('my_channel');
+    it("'#my_channel' should be 'presence-my_channel'", function() {
+      expect(streamer.subjectToChannel('#my_channel')).toEqual('presence-my_channel');
     });
   });
 
   describe("with .channelToSubject", function() {
-    it("'tweets' should be '#tweets'", function() {
-      expect(streamer.channelToSubject('tweets')).toEqual('#tweets');
+    it("'presence-tweets' should be '#tweets'", function() {
+      expect(streamer.channelToSubject('presence-tweets')).toEqual('#tweets');
     });
-    it("'OZstuff' should be '#OZstuff'", function() {
-      expect(streamer.channelToSubject('OZstuff')).toEqual('#OZstuff');
+    it("'presence-OZstuff' should be '#OZstuff'", function() {
+      expect(streamer.channelToSubject('presence-OZstuff')).toEqual('#OZstuff');
     });
-    it("'my_channel' should be '#my_channel'", function() {
-      expect(streamer.channelToSubject('my_channel')).toEqual('#my_channel');
+    it("'presence-my_channel' should be '#my_channel'", function() {
+      expect(streamer.channelToSubject('presence-my_channel')).toEqual('#my_channel');
     });
   });
 
@@ -80,27 +94,23 @@ describe("for streamer", function() {
   });
 
   describe("with .isChannelMissing", function() {
-    it("should be false when not trackable", function() {
-      expect(streamer.isChannelMissing('presence-foobar')).toBe(false);
+    it("should be true when no other channels", function() {
+      expect(streamer.isChannelMissing('presence-foobar')).toBe(true);
     });
 
-    it("should be true when trackable and no other channels", function() {
-      expect(streamer.isChannelMissing('foobar')).toBe(true);
-    });
-
-    it("should be true when trackable and different channels", function() {
+    it("should be true when different channels", function() {
       streamer.currentSubjects().push('#channelname');
-      expect(streamer.isChannelMissing('foobar')).toBe(true);
+      expect(streamer.isChannelMissing('presence-foobar')).toBe(true);
     });
 
     it("should be false when already existing as a channel", function() {
       streamer.currentSubjects().push('#foobar');
-      expect(streamer.isChannelMissing('foobar')).toBe(false);
+      expect(streamer.isChannelMissing('presence-foobar')).toBe(false);
     });
 
     it("should be false when already existing as a channel with different case", function() {
       streamer.currentSubjects().push('#FooBar');
-      expect(streamer.isChannelMissing('foobar')).toBe(false);
+      expect(streamer.isChannelMissing('presence-foobar')).toBe(false);
     });
   });
 

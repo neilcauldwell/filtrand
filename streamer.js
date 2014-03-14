@@ -28,7 +28,7 @@ var subjectToChannel = {};
 
 var streamer = exports;
 var pusher = null;
-var subjects = [];
+var subjects = []; //the hastags e.g. #litchat (includes the hash/pound symbol '#')
 var subjectsPendingDisconnection = [];
 var reconnectionInterval = 600000; //10 minutes
 var channelCheckInterval = 30000; //30 seconds
@@ -126,9 +126,15 @@ streamer.track = function(channels) {
 };
 
 streamer.isTrackableChannel = function(name) {
-  return name.indexOf('presence-') != 0 && 
-    name.indexOf('private-') != 0 &&
-    name != 'subjects';
+  return name.indexOf('presence-') === 0;
+}
+
+streamer.extractPresenceChannel = function(name) {
+  if (streamer.isTrackableChannel(name)) {
+    return name.substring('presence-'.length);
+  } else {
+    return null;
+  }
 }
 
 // stop tracking passed subject
@@ -234,17 +240,19 @@ streamer.subjectsPendingDisconnection = function() {
 // supporting functions
 
 streamer.subjectToChannel = function(subject) {
-	subject = subject.replace(/^#/, "");
-  return encodeURIComponent(subject).replace('-', '-0')
+  subject = subject.replace(/^#/, "");
+  var encoded = encodeURIComponent(subject).replace('-', '-0')
     .replace('.', '-2').replace('!', '-3').replace('~', '-4').replace('*', '-5')
-    .replace('(', '-6').replace(')', '-7')
+    .replace('(', '-6').replace(')', '-7');
+  return "presence-" + encoded;
 };
 
 streamer.channelToSubject = function(channel) {
-	channel = ("#"+channel);
+  channel = streamer.extractPresenceChannel(channel);
+  channel = ("#"+channel);
   return decodeURI(channel.replace('-7', ')').replace('-6', '(').replace('-5', '*')
-                   .replace('-4', '~').replace('-3', '!').replace('-2', '.')
-                   .replace('-0', '-'));
+    .replace('-4', '~').replace('-3', '!').replace('-2', '.')
+    .replace('-0', '-'));
 };
 
 var includes = function(item, array) {
@@ -353,7 +361,7 @@ var emitTweet = function(subject, tweet) {
 };
 
 var emitEvent = function(channel, event, data) {
-  pusher.trigger('presence-' + channel, event, data, null, function(err, req, res) {
+  pusher.trigger(channel, event, data, null, function(err, req, res) {
     if (err) {
       console.log("Could not emit event on Pusher API.", err);
       sentry.captureError("Failed to emit Pusher event with error: " + err,
