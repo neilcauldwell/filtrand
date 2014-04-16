@@ -20,14 +20,14 @@ streamer.initPeriodicChannelCheck();
 
 // setup server
 var app = express.createServer();
-//use raven/sentry for error handing
-app.error(raven.middleware.express(process.env.SENTRY_DSN));
 // static content middleware
 app.use(express.static(__dirname + '/public'));
 // web hooks auth middleware, keep before body parser
 app.use(auth.getAuthMiddleware(process.env.PUSHER_KEY, process.env.PUSHER_SECRET));
 // body parser
 app.use(express.bodyParser());
+// use raven/sentry for error handing
+app.use(raven.middleware.express(process.env.SENTRY_DSN));
 
 // routes
 
