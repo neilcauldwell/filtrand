@@ -63,6 +63,11 @@ describe("for streamer", function() {
       expect(streamer.hasWhiteListedSource(tweet)).toBe(true);
     });
 
+    it("should be true for tweetdeck (with full url)", function() {
+      var tweet = { source: '<a href=https://about.twitter.com/products/tweetdeck" rel="nofollow">TweetDeck</a>' };
+      expect(streamer.hasWhiteListedSource(tweet)).toBe(true);
+    });
+
     it("should not be true for tenchotweeter", function() {
       var tweet = { source: "tenchotweeter" };
       expect(streamer.hasWhiteListedSource(tweet)).toBe(false);
