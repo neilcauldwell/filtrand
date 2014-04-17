@@ -372,6 +372,7 @@ var ntwitterConnect = function ntwitterConnect() {
   
   //if we are waiting to reconnect because of an error don't do anything.
   if (streamer.errorReconnectTimeoutId) {
+    console.log("Skipping reconnect because we are waiting for an error timeout");
     sentry.captureError("Skipping reconnect because we are waiting for an error timeout",
       {level: 'info', extra: {subjects: JSON.stringify(subjects)}});
     return;
@@ -406,7 +407,8 @@ var ntwitterConnect = function ntwitterConnect() {
         streamer.activeStream = previousStream; 
         stream.destroy();
         streamer.errorReconnectTimeoutId = setTimeout(function() { 
-          sentry.captureError("Attempting to reconnect to twitter after rate limit error.",
+          console.log("Attempting to reconnect to twitter after rate limit error");
+          sentry.captureError("Attempting to reconnect to twitter after rate limit error",
             {level: 'info', extra: {subjects: JSON.stringify(subjects)}});
           streamer.errorReconnectTimeoutId = null;
           ntwitterConnect();
@@ -420,13 +422,17 @@ var ntwitterConnect = function ntwitterConnect() {
   //if there was a previous stream wait 5 seconds for the 
   //new stream to come online before killing the old one,
   if (previousStream) {
-    setTimeout(function() { 
-      //don't kill it if it's still active, (such as on a connection error)
-      if (previousStream !== streamer.activeStream) {
-        previousStream.destroy(); 
-        previousStream = null;
-      }
-    }, 5000);
+    //wrap the function in a closure so we kill the correct stream even
+    //if the previousStream changes in the meantime
+    (function(oldStream) { 
+      setTimeout(function() { 
+        //don't kill it if it's still active, (such as on a connection error)
+        if (oldStream && oldStream !== streamer.activeStream) {
+          oldStream.destroy(); 
+          oldStream = null;
+        }
+      }, 5000);
+    }(previousStream));
   }
 
 };
