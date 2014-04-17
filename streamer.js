@@ -365,6 +365,19 @@ var emitEvent = function(channel, event, data) {
   });
 };
 
+function killOldStream(oldStream) {
+  //wait 5 seconds before killing the old stream to let the new stream take effect
+  setTimeout(function() { 
+    if (oldStream && oldStream !== streamer.activeStream) {
+      //don't kill it if it's still active, (such as on a connection error)
+      oldStream.destroy(); 
+    } else if (oldStream && oldStream === streamer.activeStream) {
+      //if it's still active we'll want to kill it eventually, so keep retrying
+      killOldStream(oldStream);
+    }
+  }, 5000);
+}
+
 streamer.activeStream = null; //the twitter stream
 var ntwitterConnect = function ntwitterConnect() {
   //TODO: we should process any pending disconnects and remove them from the disconnect
@@ -378,7 +391,10 @@ var ntwitterConnect = function ntwitterConnect() {
     return;
   }
 
-  var previousStream = streamer.activeStream;
+  //if there is an existing stream we'll want to kill it
+  if (streamer.activeStream) {
+    killOldStream(streamer.activeStream);
+  }
 
   ntwit = new ntwitter({
     consumer_key: streamer.twitter_consumer_key,
@@ -389,8 +405,12 @@ var ntwitterConnect = function ntwitterConnect() {
 
   console.log("ntwitterConnect with subjects" + util.inspect(subjects));
   ntwit.stream('statuses/filter', { track: subjects }, function(stream) {
-    streamer.activeStream = stream;
+    var dataReceived = false;
     stream.on('data', function (data) {
+      if (!dataReceived) {
+        dataReceived = true;
+        streamer.activeStream = stream;
+      }
       tweetEmitter(data);
     });
     stream.on('end', function (response) { console.log("ntwitter.stream Ended") });
@@ -404,7 +424,7 @@ var ntwitterConnect = function ntwitterConnect() {
       //try to reconnect if we get an rate limit error
       if (statusCode === 420 || statusCode === 429) {
         //we want to keep the previous stream active and kill this one
-        streamer.activeStream = previousStream; 
+        if (streamer.activeStream === stream) { streamer.activeStream = null; }
         stream.destroy();
         streamer.errorReconnectTimeoutId = setTimeout(function() { 
           console.log("Attempting to reconnect to twitter after rate limit error");
@@ -418,21 +438,5 @@ var ntwitterConnect = function ntwitterConnect() {
   });
 
   lastConnectionTimestamp = Date.now();
-
-  //if there was a previous stream wait 5 seconds for the 
-  //new stream to come online before killing the old one,
-  if (previousStream) {
-    //wrap the function in a closure so we kill the correct stream even
-    //if the previousStream changes in the meantime
-    (function(oldStream) { 
-      setTimeout(function() { 
-        //don't kill it if it's still active, (such as on a connection error)
-        if (oldStream && oldStream !== streamer.activeStream) {
-          oldStream.destroy(); 
-          oldStream = null;
-        }
-      }, 5000);
-    }(previousStream));
-  }
 
 };
