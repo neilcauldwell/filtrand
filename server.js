@@ -6,17 +6,17 @@ var express = require("express");
 var raven = require('raven');
 
 var auth = require("./web_hooks_auth");
-var streamer = require("./streamer");
+var ChannelRegulator = require("./ChannelRegulator");
 
 var appTitle = "Filtrand";
 
-// setup twitter streamer
-streamer.appSetup(process.env.PUSHER_KEY, process.env.PUSHER_SECRET, process.env.PUSHER_APP_ID);
-streamer.ntwitterSetup(process.env.TWITTER_CONSUMER_KEY, process.env.TWITTER_CONSUMER_SECRET, process.env.TWITTER_ACCESS_TOKEN_KEY, process.env.TWITTER_ACCESS_TOKEN_SECRET);
-streamer.initiateReconnectionTimer();
-streamer.initPeriodicChannelCheck();
+var pusher = new Pusher({
+  appId: process.env.PUSHER_KEY,
+  key: process.env.PUSHER_SECRET,
+  secret: process.env.PUSHER_APP_ID
+});
 
-// 
+var channelRegulator = new ChannelRegulator(pusher, JSON.parse(process.env.TWITTER_ACCOUNTS));
 
 // setup server
 var app = express.createServer();
@@ -37,8 +37,8 @@ app.get("/", function (req, res) {
     key: process.env.PUSHER_KEY,
     layout: false,
     appTitle: appTitle,
-    currentSubjects: streamer.currentSubjects(),
-    pendings: streamer.subjectsPendingDisconnection()
+    currentSubjects: channelRegulator.currentSubjects(),
+    pendings: channelRegulator.subjectsPendingDisconnection()
   };
 
   res.render('index.jade', returnVars);
@@ -60,9 +60,9 @@ app.post("/webhooks", function (req, res) {
     var channel = events[i].channel;
 
     if (event == "channel_occupied") {
-      streamer.track(channel);
+      channelRegulator.track(channel);
     } else if (event == "channel_vacated") {
-      streamer.untrack(channel);
+      channelRegulator.untrack(channel);
     }
   }
 
@@ -92,10 +92,10 @@ app.post("/manualhooks", function (req, res) {
       if (channel != "subjects") {
         if (event == "channel_occupied") {
           console.log("ManualHook dispatched track request:"+channel);
-          streamer.track(channel);
+          channelRegulator.track(channel);
         } else if (event == "channel_vacated") {
           console.log("ManualHook dispatched untrack request:"+channel);
-          streamer.untrack(channel);
+          channelRegulator.untrack(channel);
         };
       };
     };

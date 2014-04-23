@@ -1,6 +1,6 @@
 {
   "name": "filtrand",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "dependencies": {
     "express": "2.5.4",
     "jade": "0.34.X",
@@ -8,8 +8,8 @@
     "ntwitter": "0.5.0",
     "raven": "0.5.2", 
     "pg": "2.8.2",
-    "sql": "0.31.0"
-
+    "sql": "0.31.0",
+    "underscore": "1.5.X"
   },
   "engines": {
     "node": "0.8.X",
