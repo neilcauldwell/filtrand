@@ -2,6 +2,7 @@ var util = require('util');
 var _ = require('underscore');
 
 var Pusher = require('pusher');
+var NTwitter = require('ntwitter');
 var raven = require('raven');
 var sentry = new raven.Client(process.env.SENTRY_DSN);
 
@@ -29,23 +30,22 @@ var ChannelBank = require('./channelbank');
 var channelCheckInterval = 30000; //30 seconds
 var assignBySizeCutoff = 60000; //60 second
 
-
-var ChannelRegulator = module.exports = function(pusher, twitterAccount) {
+var ChannelRegulator = module.exports = function(pusher, twitterAccounts) {
   this.channelBanks = [];
   thist.hasInitiatedTracking = false;
 
   this.pusher = pusher;
   for (var account in twitterAccounts) {
-    var cb = new ChannelBank(pusher, account);
+    var cb = new ChannelBank(pusher, NTwitter, account);
     this.channelBanks.append(cb);
   };
   this.initPeriodicChannelCheck();
 };
 
-
 ChannelRegulator.prototype.initPeriodicChannelCheck = function() {
   this.ensurePusherChannelsAreTracked();
-  setInterval(this.ensurePusherChannelsAreTracked, channelCheckInterval);
+  this.periodicChannelCheckId = 
+    setInterval(this.ensurePusherChannelsAreTracked, channelCheckInterval);
 };
 
 ChannelRegulator.prototype.ensurePusherChannelsAreTracked = function() {
@@ -93,6 +93,9 @@ ChannelRegulator.prototype.track = function(channels) {
     this.hasInitiatedTracking = true;
     return;
   }
+
+  //TODO: We need to do the next bit in reverse because subjects that are pending disconnect
+  //are also in the subjects list
 
   //firstly remove any we're already tracking
   subjects = _.difference(subjects, this.currentSubjects());
@@ -168,4 +171,7 @@ ChannelRegulator.prototype.currentChannels = function() {
   return channels;
 };
 
+ChannelRegulator.prototype.clear = function() {
+  clearInterval(this.periodicChannelCheckId);
+};
 

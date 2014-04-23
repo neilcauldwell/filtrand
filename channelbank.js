@@ -1,7 +1,6 @@
 var util = require('util');
 var _ = require('underscore');
 
-var ntwitter = require('ntwitter');
 var raven = require('raven');
 var sentry = new raven.Client(process.env.SENTRY_DSN);
 
@@ -73,13 +72,15 @@ var tweetSourceWhiteList = [
   "tweetro+"
 ];
 
-
-var ChannelBank = module.exports  = function(pusher, twitterAccount) {
+var ChannelBank = module.exports  = function(pusher, NTwitter, twitterAccount) {
   this.pusher = pusher;
-  this.twitter_consumer_key = twitterAccount.twitter_consumer_key;
-  this.twitter_consumer_secret = twitterAccount.twitter_consumer_secret;
-  this.twitter_access_token_key = twitterAccount.twitter_access_token_key;
-  this.twitter_access_token_secret = twitterAccount.twitter_access_token_secret;
+  this.NTwitter = NTwitter;
+  if (twitterAccount) {
+    this.twitter_consumer_key = twitterAccount.twitter_consumer_key;
+    this.twitter_consumer_secret = twitterAccount.twitter_consumer_secret;
+    this.twitter_access_token_key = twitterAccount.twitter_access_token_key;
+    this.twitter_access_token_secret = twitterAccount.twitter_access_token_secret;
+  }
 
   this.subjects = [];
   this.subjectsPendingDisconnection = [];
@@ -88,29 +89,32 @@ var ChannelBank = module.exports  = function(pusher, twitterAccount) {
   this.twitterReconnectionTime = Date.now();
 
   this.initiateReconnectionTimer();
-  return 
+  return this;
 };
 
 // start tracking passed subject, can be a single channel, or an array of channels
 ChannelBank.prototype.track = function(subjectlist) {
+  var that = this;
   if (subjectlist == null || subjectlist.length === 0) { return; }
-  var newToTrack = subjectlist.filter(function (s) { return !_.contains(this.subjects, s); });
+  var newToTrack = subjectlist.filter(function (s) { return !_.contains(that.subjects, s); });
+  var pendingToTrack = subjectlist.filter(function (s) { return _.contains(that.subjectsPendingDisconnection, s); });
 
   if (newToTrack.length) {
     newToTrack.forEach(function (subject) {
-      emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", subject: subject });
-      this.subjects.push(subject);
+      that.emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", subject: subject });
+      that.subjects.push(subject);
       console.log("now tracking channel: " + subject)
     });
 
-    newToTrack.forEach(function (subject) {
-      if (_.contains(this.subjectsPendingDisconnection, subject)) {
-        console.log("no longer pending disconnection for:" + subject)
-        this.subjectsPendingDisconnection.splice(this.subjectsPendingDisconnection.indexOf(subject), 1);
-      };
-    });
-
     this.ntwitterConnect();
+  }
+
+  if (pendingToTrack.length) {
+    pendingToTrack.forEach(function (subject) {
+      that.emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", subject: subject });
+      console.log("no longer pending disconnection for:" + subject);
+      that.subjectsPendingDisconnection.splice(that.subjectsPendingDisconnection.indexOf(subject), 1);
+    });
   }
 };
 
@@ -118,13 +122,13 @@ ChannelBank.prototype.track = function(subjectlist) {
 ChannelBank.prototype.untrack = function(subject) {
   var channelName = streamerUtils.subjectToChannel(subject);
 
-  if (_.contains(this.subject, ssubject)) {
+  if (_.contains(this.subjects, subject)) {
     this.emitEvent("subjects", "subject-unsubscribed", { type: "subject-unsubscribed", channel: channelName, subject: subject });
 
     if (!_.contains(this.subjectsPendingDisconnection, subject)) {
       this.subjectsPendingDisconnection.push(subject);
-    };
-  };
+    }
+  }
 };
 
 ChannelBank.prototype.hasSubject = function(name) {
@@ -132,7 +136,7 @@ ChannelBank.prototype.hasSubject = function(name) {
 };
 
 ChannelBank.prototype.initiateReconnectionTimer = function() {
-  setInterval(function() {
+  this.reconnectionTimerId =  setInterval(function() {
     this.reconnect();
   }, this.reconnectionInterval);
 };
@@ -140,7 +144,7 @@ ChannelBank.prototype.initiateReconnectionTimer = function() {
 ChannelBank.prototype.reconnectableSubjects = function() {
   for (var i = 0; i < this.subjectsPendingDisconnection.length; i++) {
     this.subjects.splice(this.subjects.indexOf(this.subjectsPendingDisconnection[i]), 1);
-  };
+  }
   return subjects;
 };
 
@@ -150,7 +154,7 @@ ChannelBank.prototype.reconnect = function() {
     console.log("Initiating reconnect and clearing out pending disconnects for: " + util.inspect(this.subjectsPendingDisconnection));
     this.ntwitterConnect();
     this.subjectsPendingDisconnection = [];
-  };
+  }
 };
 
 ChannelBank.prototype.hasWhiteListedSource = function(tweet) {
@@ -188,8 +192,8 @@ ChannelBank.prototype.tweetEmitter = function(tweet) {
     if (text.indexOf(this.subjects[i]) != -1) {
       this.emitTweet(this.subjects[i], tweet);
       da.store_received_tweet(tweet, this.subjects[i], true);
-    };
-  };
+    }
+  }
 };
 
 ChannelBank.prototype.emitTweet = function(subject, tweet) {
@@ -271,7 +275,7 @@ ChannelBank.prototype.killOldStream = function killOldStream(oldStream) {
       that.killOldStream(oldStream);
     }
   }, 5000);
-}
+};
 
 ChannelBank.prototype.ntwitterConnect = function() {
   var that = this;
@@ -291,7 +295,7 @@ ChannelBank.prototype.ntwitterConnect = function() {
     this.killOldStream(this.activeStream);
   }
 
-  ntwit = new ntwitter({
+  ntwit = new this.NTwitter({
     consumer_key: this.twitter_consumer_key,
     consumer_secret: this.twitter_consumer_secret,
     access_token_key: this.twitter_access_token_key,
@@ -334,3 +338,9 @@ ChannelBank.prototype.ntwitterConnect = function() {
 
   this.twitterReconnectionTime = Date.now();
 };
+
+ChannelBank.prototype.clear = function() {
+  clearInterval(this.reconnectionTimerId);
+  clearTimeout(this.errorReconnectTimeoutId);
+};
+
