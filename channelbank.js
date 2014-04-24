@@ -146,7 +146,7 @@ ChannelBank.prototype.reconnectableSubjects = function() {
   for (var i = 0; i < this.subjectsPendingDisconnection.length; i++) {
     this.subjects.splice(this.subjects.indexOf(this.subjectsPendingDisconnection[i]), 1);
   }
-  return subjects;
+  return this.subjects;
 };
 
 ChannelBank.prototype.reconnect = function() {
