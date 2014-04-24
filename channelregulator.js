@@ -59,7 +59,6 @@ ChannelRegulator.prototype.ensurePusherChannelsAreTracked = function() {
     } else if( response.statusCode === 200 ) {
       var result = JSON.parse( response.body );
       var receivedChannels = Object.keys(result.channels);
-      console.log(receivedChannels);
       var receivedChannels = receivedChannels.filter(streamerUtils.isTrackableChannel);
       var trackedChannels = that.currentChannels();
       var pendingChannels = that.channelsPendingDisconnection();

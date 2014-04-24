@@ -103,7 +103,7 @@ ChannelBank.prototype.track = function(subjectlist) {
     newToTrack.forEach(function (subject) {
       that.emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", subject: subject });
       that.subjects.push(subject);
-      console.log("now tracking channel: " + subject)
+      console.log("now tracking channel: " + subject + " on twitter account: '" + that.twitter_consumer_key + "'");
     });
 
     this.ntwitterConnect();
@@ -112,7 +112,7 @@ ChannelBank.prototype.track = function(subjectlist) {
   if (pendingToTrack.length) {
     pendingToTrack.forEach(function (subject) {
       that.emitEvent("subjects", "subject-subscribed", { type: "subject-subscribed", subject: subject });
-      console.log("no longer pending disconnection for:" + subject);
+      console.log("no longer pending disconnection for:" + subject + " on twitter account: '" + that.twitter_consumer_key + "'");
       that.subjectsPendingDisconnection.splice(that.subjectsPendingDisconnection.indexOf(subject), 1);
     });
   }
@@ -136,8 +136,9 @@ ChannelBank.prototype.hasSubject = function(name) {
 };
 
 ChannelBank.prototype.initiateReconnectionTimer = function() {
+  var that = this;
   this.reconnectionTimerId =  setInterval(function() {
-    this.reconnect();
+    that.reconnect();
   }, this.reconnectionInterval);
 };
 
@@ -151,7 +152,7 @@ ChannelBank.prototype.reconnectableSubjects = function() {
 ChannelBank.prototype.reconnect = function() {
   var subjects = this.reconnectableSubjects();
   if ((this.subjectsPendingDisconnection.length > 0)) {
-    console.log("Initiating reconnect and clearing out pending disconnects for: " + util.inspect(this.subjectsPendingDisconnection));
+    console.log("Initiating reconnect and clearing out pending disconnects for: " + util.inspect(this.subjectsPendingDisconnection) + " on twitter account: '" + this.twitter_consumer_key + "'");
     this.ntwitterConnect();
     this.subjectsPendingDisconnection = [];
   }
@@ -251,11 +252,12 @@ ChannelBank.prototype.emitTweet = function(subject, tweet) {
 };
 
 ChannelBank.prototype.emitEvent = function(channel, event, data) {
+  var that = this;
   this.pusher.trigger(channel, event, data, null, function(err, req, res) {
     if (err) {
       console.log("Could not emit event on Pusher API.", err);
       sentry.captureError("Failed to emit Pusher event with error: " + err,
-        {extra: {channel: channel, data: JSON.stringify(data)}});
+        {extra: {channel: channel, data: JSON.stringify(data), twitter_account: that.twitter_consumer_key}});
     }
     else {
       //console.log("Emitted tweet about " + subject + ": " + tweet.text)
@@ -284,9 +286,9 @@ ChannelBank.prototype.ntwitterConnect = function() {
   
   //if we are waiting to reconnect because of an error don't do anything.
   if (this.errorReconnectTimeoutId) {
-    console.log("Skipping reconnect because we are waiting for an error timeout");
+    console.log("Skipping reconnect because we are waiting for an error timeout on twitter account: '" + this.twitter_consumer_key + "'");
     sentry.captureError("Skipping reconnect because we are waiting for an error timeout",
-      {level: 'info', extra: {subjects: JSON.stringify(this.subjects)}});
+      {level: 'info', extra: {subjects: JSON.stringify(this.subjects), twitter_account: this.twitter_consumer_key}});
     return;
   }
 
@@ -302,7 +304,7 @@ ChannelBank.prototype.ntwitterConnect = function() {
     access_token_secret: this.twitter_access_token_secret
   });
 
-  console.log("ntwitterConnect with subjects" + util.inspect(this.subjects));
+  console.log("ntwitterConnect with subjects" + util.inspect(this.subjects)  + " on twitter account: '" + this.twitter_consumer_key + "'");
   ntwit.stream('statuses/filter', { track: this.subjects }, function(stream) {
     var dataReceived = false;
     stream.on('data', function (data) {
@@ -316,9 +318,9 @@ ChannelBank.prototype.ntwitterConnect = function() {
     stream.on('destroy', function (response) { console.log("ntwitter.stream Destroyed") });
     stream.on('error', function (err, statusCode) { 
       statusCode = statusCode || 200;
-      console.log("ntwitter.stream Error: " + err + " StatusCode: " + statusCode); 
+      console.log("ntwitter.stream Error: " + err + " StatusCode: " + statusCode + " on twitter account: '" + that.twitter_consumer_key + "'"); 
       sentry.captureError("ntwitter.stream Error: " + JSON.stringify(err) + " StatusCode: " + statusCode,
-        {extra: {subjects: JSON.stringify(that.subjects), statusCode: statusCode}});
+        {extra: {subjects: JSON.stringify(that.subjects), statusCode: statusCode, twitter_account: that.twitter_consumer_key}});
 
       //try to reconnect if we get an rate limit error
       if (statusCode === 420 || statusCode === 429) {
@@ -328,7 +330,7 @@ ChannelBank.prototype.ntwitterConnect = function() {
         that.errorReconnectTimeoutId = setTimeout(function() { 
           console.log("Attempting to reconnect to twitter after rate limit error");
           sentry.captureError("Attempting to reconnect to twitter after rate limit error",
-            {level: 'info', extra: {subjects: JSON.stringify(that.subjects)}});
+            {level: 'info', extra: {subjects: JSON.stringify(that.subjects), twitter_account: that.twitter_consumer_key}});
           that.errorReconnectTimeoutId = null;
           that.ntwitterConnect();
         }, 30000); //30 secs
@@ -342,7 +344,7 @@ ChannelBank.prototype.ntwitterConnect = function() {
         that.errorReconnectTimeoutId = setTimeout(function() { 
           console.log("Attempting to reconnect to twitter after server error");
           sentry.captureError("Attempting to reconnect to twitter after server error",
-            {level: 'error', extra: {subjects: JSON.stringify(that.subjects)}});
+            {level: 'error', extra: {subjects: JSON.stringify(that.subjects), twitter_account: that.twitter_consumer_key}});
           that.errorReconnectTimeoutId = null;
           that.ntwitterConnect();
         }, 10000); //10 secs
