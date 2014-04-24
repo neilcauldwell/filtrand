@@ -2,21 +2,23 @@ var util = require('util');
 var url = require("url");
 var crypto = require("crypto");
 
+var Pusher = require('pusher');
 var express = require("express");
 var raven = require('raven');
 
 var auth = require("./web_hooks_auth");
-var ChannelRegulator = require("./ChannelRegulator");
+var ChannelBank = require('./channelbank');
+var ChannelRegulator = require("./channelregulator");
 
 var appTitle = "Filtrand";
 
 var pusher = new Pusher({
-  appId: process.env.PUSHER_KEY,
-  key: process.env.PUSHER_SECRET,
-  secret: process.env.PUSHER_APP_ID
+  appId: process.env.PUSHER_APP_ID,
+  key: process.env.PUSHER_KEY,
+  secret: process.env.PUSHER_SECRET
 });
 
-var channelRegulator = new ChannelRegulator(pusher, JSON.parse(process.env.TWITTER_ACCOUNTS));
+var channelRegulator = new ChannelRegulator(ChannelBank, pusher, JSON.parse(process.env.TWITTER_ACCOUNTS));
 
 // setup server
 var app = express.createServer();
