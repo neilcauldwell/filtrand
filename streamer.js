@@ -434,6 +434,20 @@ var ntwitterConnect = function ntwitterConnect() {
           ntwitterConnect();
         }, 30000); //30 secs
       }
+
+      //try to reconnect if we get a server error
+      if (statusCode === 501 || statusCode === 503 || statusCode === 504) {
+        //we want to keep the previous stream active and kill this one
+        if (streamer.activeStream === stream) { streamer.activeStream = null; }
+        stream.destroy();
+        streamer.errorReconnectTimeoutId = setTimeout(function() { 
+          console.log("Attempting to reconnect to twitter after server error");
+          sentry.captureError("Attempting to reconnect to twitter after server error",
+            {level: 'error', extra: {subjects: JSON.stringify(subjects)}});
+          streamer.errorReconnectTimeoutId = null;
+          ntwitterConnect();
+        }, 10000); //10 secs
+      }
     });
   });
 
