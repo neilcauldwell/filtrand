@@ -323,7 +323,7 @@ ChannelBank.prototype.ntwitterConnect = function() {
         {extra: {subjects: JSON.stringify(that.subjects), statusCode: statusCode, twitter_account: that.twitter_consumer_key}});
 
       //try to reconnect if we get an rate limit error
-      if (statusCode === 420 || statusCode === 429) {
+      if (statusCode === 420 || statusCode === 429 || statusCode === 401) {
         //we want to keep the previous stream active and kill this one
         if (that.activeStream === stream) { that.activeStream = null; }
         stream.destroy();
