@@ -12,6 +12,10 @@ var ChannelRegulator = require("./channelregulator");
 
 var appTitle = "Filtrand";
 
+process.on('uncaughtException', function(err) {
+    console.log('Caught exception: ' + err);
+});
+
 //let sentry catch all global errors //NOTE: there is a seperate middleware on 
 //express, but that's not catching issues with the channelRegulator/channelBank
 var sentry = new raven.Client(process.env.SENTRY_DSN);

@@ -7,6 +7,8 @@ var sentry = new raven.Client(process.env.SENTRY_DSN);
 var da = require('./data_access');
 var streamerUtils = require('./streamerutils');
 
+global.stream_number = 0;
+
 //all lowercase.
 var tweetSourceWhiteList = [
   "twitter for iphone",
@@ -179,7 +181,7 @@ ChannelBank.prototype.tweetEmitter = function(tweet) {
 
   //only emit tweets with a whitelisted source
   if (!this.hasWhiteListedSource(tweet)) {
-    console.log("Received non-whitelisted tweet with text: " + tweet.text);
+    console.log("Non-Whitelist tweet on stream " + this.activeStream.stream_number + ": " + tweet.text);
     for (var i in this.subjects) {
       if (text.indexOf(this.subjects[i]) != -1) {
         da.store_received_tweet(tweet, this.subjects[i], false, "source not on whitelist");
@@ -188,7 +190,7 @@ ChannelBank.prototype.tweetEmitter = function(tweet) {
     return;
   }
 
-  console.log("Received whitelisted tweet with text: " + tweet.text);
+  console.log("Whitelist tweet on stream " + this.activeStream.stream_number + ": " + tweet.text);
   for (var i in this.subjects) {
     if (text.indexOf(this.subjects[i]) != -1) {
       this.emitTweet(this.subjects[i], tweet);
@@ -271,7 +273,8 @@ ChannelBank.prototype.killOldStream = function killOldStream(oldStream) {
   setTimeout(function() { 
     if (oldStream && oldStream !== that.activeStream) {
       //don't kill it if it's still active, (such as on a connection error)
-      oldStream.destroy(); 
+        console.log("ID of the stream being destroyed: " + oldStream.stream_number + "; New Stream ID: " + that.activeStream.stream_number)
+      oldStream.destroy();
     } else if (oldStream && oldStream === that.activeStream) {
       //if it's still active we'll want to kill it eventually, so keep retrying
       that.killOldStream(oldStream);
@@ -307,6 +310,8 @@ ChannelBank.prototype.ntwitterConnect = function() {
   console.log("ntwitterConnect with subjects" + util.inspect(this.subjects)  + " on twitter account: '" + this.twitter_consumer_key + "'");
   ntwit.stream('statuses/filter', { track: this.subjects }, function(stream) {
     var dataReceived = false;
+    stream.stream_number = global.stream_number + 1;
+    global.stream_number ++;
     stream.on('data', function (data) {
       if (!dataReceived) {
         dataReceived = true;
