@@ -88,6 +88,7 @@ var ChannelBank = module.exports  = function(pusher, NTwitter, twitterAccount) {
   this.subjectsPendingDisconnection = [];
   this.reconnectionInterval = 600000; //10 minutes
   this.activeStream = null; //the twitter stream
+  this.astream = null;
   this.twitterReconnectionTime = Date.now();
 
   this.initiateReconnectionTimer();
@@ -171,7 +172,7 @@ ChannelBank.prototype.hasWhiteListedSource = function(tweet) {
   return false;
 };
 
-ChannelBank.prototype.tweetEmitter = function(tweet) {
+ChannelBank.prototype.tweetEmitter = function(tweet, stream) {
   if (tweet.text == undefined) {
     da.store_received_tweet(tweet, null, false, "tweet object has undefined text field");
     return;
@@ -181,7 +182,7 @@ ChannelBank.prototype.tweetEmitter = function(tweet) {
 
   //only emit tweets with a whitelisted source
   if (!this.hasWhiteListedSource(tweet)) {
-    console.log("Non-Whitelist tweet on stream " + this.activeStream.stream_number + ": " + tweet.text);
+      console.log("Stream " + stream.stream_number + " received NW tweet: " + tweet.id + "; activestream " + this.activeStream.stream_number);
     for (var i in this.subjects) {
       if (text.indexOf(this.subjects[i]) != -1) {
         da.store_received_tweet(tweet, this.subjects[i], false, "source not on whitelist");
@@ -190,7 +191,7 @@ ChannelBank.prototype.tweetEmitter = function(tweet) {
     return;
   }
 
-  console.log("Whitelist tweet on stream " + this.activeStream.stream_number + ": " + tweet.text);
+  console.log("Stream " + stream.stream_number + " received W tweet: " + tweet.id + "; activestream " + this.activeStream.stream_number);
   for (var i in this.subjects) {
     if (text.indexOf(this.subjects[i]) != -1) {
       this.emitTweet(this.subjects[i], tweet);
@@ -267,13 +268,21 @@ ChannelBank.prototype.emitEvent = function(channel, event, data) {
   });
 };
 
+ChannelBank.prototype.stream_id = function stream_id(stream) {
+    try {
+        return stream.stream_number;
+    } catch(err) {
+        return "null";
+    }
+}
+
 ChannelBank.prototype.killOldStream = function killOldStream(oldStream) {
   var that = this;
   //wait 5 seconds before killing the old stream to let the new stream take effect
-  setTimeout(function() { 
+  setTimeout(function() {
     if (oldStream && oldStream !== that.activeStream) {
       //don't kill it if it's still active, (such as on a connection error)
-        console.log("ID of the stream being destroyed: " + oldStream.stream_number + "; New Stream ID: " + that.activeStream.stream_number)
+      console.log("ID of the stream being destroyed: " + that.stream_id(oldStream) + "; New ActiveStream ID: " + that.stream_id(that.activeStream) + "; New Stream ID: " + that.stream_id(that.astream))
       oldStream.destroy();
     } else if (oldStream && oldStream === that.activeStream) {
       //if it's still active we'll want to kill it eventually, so keep retrying
@@ -296,11 +305,11 @@ ChannelBank.prototype.ntwitterConnect = function() {
   }
 
   //if there is an existing stream we'll want to kill it
-  if (this.activeStream) {
-    this.killOldStream(this.activeStream);
+  if (this.astream) {
+    this.killOldStream(this.astream);
   }
 
-  ntwit = new this.NTwitter({
+    ntwit = new this.NTwitter({
     consumer_key: this.twitter_consumer_key,
     consumer_secret: this.twitter_consumer_secret,
     access_token_key: this.twitter_access_token_key,
@@ -309,6 +318,7 @@ ChannelBank.prototype.ntwitterConnect = function() {
 
   console.log("ntwitterConnect with subjects" + util.inspect(this.subjects)  + " on twitter account: '" + this.twitter_consumer_key + "'");
   ntwit.stream('statuses/filter', { track: this.subjects }, function(stream) {
+    that.astream = stream;
     var dataReceived = false;
     stream.stream_number = global.stream_number + 1;
     global.stream_number ++;
@@ -317,7 +327,7 @@ ChannelBank.prototype.ntwitterConnect = function() {
         dataReceived = true;
         that.activeStream = stream;
       }
-      that.tweetEmitter(data);
+      that.tweetEmitter(data, stream);
     });
     stream.on('end', function (response) { console.log("ntwitter.stream Ended") });
     stream.on('destroy', function (response) { console.log("ntwitter.stream Destroyed") });
