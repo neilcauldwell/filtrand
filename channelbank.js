@@ -71,7 +71,9 @@ var tweetSourceWhiteList = [
   "manageflitter",
   "sendible",
   "chirpstory",
-  "tweetro+"
+  "tweetro+",
+  "Tweetbot for iΟS",
+  "Kneaver"
 ];
 
 var ChannelBank = module.exports  = function(pusher, NTwitter, twitterAccount) {
