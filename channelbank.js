@@ -33,7 +33,6 @@ var tweetSourceWhiteList = [
   "tweetadder v4",
   "twitter for windows phone",
   "buffer",
-  "twitterfeed", 
   "echofon",
   "twittelator",
   "sprout social",
@@ -65,15 +64,15 @@ var tweetSourceWhiteList = [
   "triberr", 
   "smqueue", 
   "tweeting machine", 
-  "twitter web client",
   "marketmesuite",
   "paper.li",
   "manageflitter",
   "sendible",
   "chirpstory",
   "tweetro+",
-  "Tweetbot for iΟS",
-  "Kneaver"
+  "tweetbot for ios",
+  "kneaver",
+  "sparkcentral.com"
 ];
 
 var ChannelBank = module.exports  = function(pusher, NTwitter, twitterAccount) {
