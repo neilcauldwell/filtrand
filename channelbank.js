@@ -70,7 +70,7 @@ var tweetSourceWhiteList = [
   "sendible",
   "chirpstory",
   "tweetro+",
-  "tweetbot for ios",
+  "tweetbot for iοs",
   "kneaver",
   "sparkcentral.com"
 ];
